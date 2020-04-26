@@ -24,6 +24,10 @@
 	"dependencies": {
 		"cac": "^6.5.8"
 	},
+	"files": [
+		"./build/modules.js",
+		"./build/modules.d.ts"
+	],
 	"np": {
 		"preview": true,
 		"contents": "./build"
