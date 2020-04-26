@@ -1,0 +1,79 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"files.exclude": {
+			"**/.git": true,
+			"**/.DS_Store": true,
+			"**/bundle": true,
+			"**/node_modules": true,
+			"**/package-lock.json": true
+		},
+		"search.exclude": {
+			"**/.git": true,
+			"**/.DS_Store": true,
+			"**/build": true,
+			"**/bundle": true,
+			"**/node_modules": true,
+			"**/package-lock.json": true
+		}
+	},
+	"launch": {
+		"configurations": [
+			{
+				"name": "Debug 'set' in NodeJS",
+				"type": "node",
+				"request": "launch",
+				"program": "${workspaceRoot}/build/moduless.js",
+				"args": [
+					"set", "./example/coverage/CoverExample.ts:5"
+				],
+				"smartStep": true,
+				"sourceMaps": true
+			},
+			{
+				"name": "Debug 'run-set' in NodeJS",
+				"type": "node",
+				"request": "launch",
+				"program": "${workspaceRoot}/build/moduless.js",
+				"args": [
+					"run-set"
+				],
+				"smartStep": true,
+				"sourceMaps": true
+			},
+			{
+				"name": "Debug 'run' in NodeJS",
+				"type": "node",
+				"request": "launch",
+				"program": "${workspaceRoot}/build/moduless.js",
+				"args": [
+					"run"
+				],
+				"smartStep": true,
+				"sourceMaps": true
+			}
+		]
+	},
+	"tasks": {
+		"version": "2.0.0",
+		"tasks": [
+			{
+				"label": "Compile Moduless",
+				"type": "shell",
+				"command": "tsc",
+				"args": ["--build", "--watch"],
+				"options": {
+					"cwd": "${workspaceFolder}"
+				},
+				"problemMatcher": ["$tsc"],
+				"runOptions": {
+					"runOn": "folderOpen"
+				}
+			}
+		]
+	}
+}

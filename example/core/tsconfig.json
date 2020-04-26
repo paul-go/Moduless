@@ -1,0 +1,13 @@
+{
+	"name": "Example",
+	"extends": "../tsconfig.standard.json",
+	"compilerOptions": {
+		"outFile": "../build/example.js"
+	},
+	"include": [
+		"**/*.ts"
+	],
+	"references": [
+		{ "path": "../../../Truth/core" }
+	]
+}

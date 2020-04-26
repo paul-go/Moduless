@@ -1,0 +1,31 @@
+{
+	"name": "moduless",
+	"version": "2.0.0",
+	"description": "",
+	"author": "Truebase",
+	"license": "MIT",
+	"keywords": [],
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/paul-go/moduless"
+	},
+	"bugs": {
+		"url": "https://github.com/paul-go/moduless/issues"
+	},
+	"main": "./build/moduless.js",
+	"bin": "./build/moduless.js",
+	"types": "./build/moduless.d.ts",
+	"scripts": {
+		
+	},
+	"devDependencies": {
+		"@types/node": "^13.13.2"
+	},
+	"dependencies": {
+		"cac": "^6.5.8"
+	},
+	"np": {
+		"preview": true,
+		"contents": "./build"
+	}
+}

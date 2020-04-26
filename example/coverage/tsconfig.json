@@ -1,0 +1,14 @@
+{
+	"name": "Example Coverage",
+	"extends": "../tsconfig.standard.json",
+	"compilerOptions": {
+		"outFile": "../build/example.coverage.js"
+	},
+	"include": [
+		"**/*.ts"
+	],
+	"references": [
+		{ "path": "../../../Truth/core" },
+		{ "path": "../core" }
+	]
+}

@@ -1,0 +1,13 @@
+{
+	"name": "Moduless",
+	"extends": "../tsconfig.standard.json",
+	"compilerOptions": {
+		"outFile": "../build/moduless.js"
+	},
+	"include": [
+		"**/*.ts"
+	],
+	"references": [
+		
+	]
+}
