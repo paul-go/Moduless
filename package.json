@@ -1,6 +1,6 @@
 {
 	"name": "moduless",
-	"version": "2.0.1",
+	"version": "2.0.2",
 	"description": "Debuggable test runner for module-free TypeScript development",
 	"author": "Truebase",
 	"license": "MIT",
