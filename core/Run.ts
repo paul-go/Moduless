@@ -68,6 +68,10 @@ namespace Moduless
 		}
 		else
 		{
+			// Wait 50ms to give the debugger a chance to connect.
+			// This can be a problem with larger projects.
+			await new Promise(r => setTimeout(r, 50));
+			
 			let hasRunOneFunction = false;
 			
 			for await (const ns of coverNamespaces)
