@@ -22,6 +22,9 @@ namespace Moduless
 		cwd = process.cwd(),
 		coverFunctionName: string = "")
 	{
+		if (coverFunctionName === "")
+			Util.log("Running all discoverable cover functions.");
+		
 		const graph = new ProjectGraph(cwd);
 		const scriptFilePaths: string[] = [];
 		
@@ -57,8 +60,7 @@ namespace Moduless
 			}
 		}
 		
-		
-		if (coverNamespaces.length === -1)
+		if (coverNamespaces.length === 0)
 		{
 			Util.error(
 				`No namespaces where found that begin with the prefix "Cover".\n` +
@@ -81,7 +83,7 @@ namespace Moduless
 			}
 			
 			if (!hasRunOneFunction)
-				Util.error("No cover functions where run, because nothing applicable could be found.");
+				Util.error("No cover functions were run, because nothing applicable could be found.");
 		}
 	}
 	

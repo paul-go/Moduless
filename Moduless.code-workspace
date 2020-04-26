@@ -24,24 +24,23 @@
 	"launch": {
 		"configurations": [
 			{
+				"name": "Debug default in NodeJS",
+				"type": "node",
+				"request": "launch",
+				"program": "${workspaceRoot}/build/moduless.js",
+				"cwd": "${workspaceFolder}/example",
+				"smartStep": true,
+				"sourceMaps": true
+			},
+			{
 				"name": "Debug 'set' in NodeJS",
 				"type": "node",
 				"request": "launch",
 				"program": "${workspaceRoot}/build/moduless.js",
 				"args": [
-					"set", "./example/coverage/CoverExample.ts:5"
+					"set", "./coverage/CoverExample.ts:5"
 				],
-				"smartStep": true,
-				"sourceMaps": true
-			},
-			{
-				"name": "Debug 'run-set' in NodeJS",
-				"type": "node",
-				"request": "launch",
-				"program": "${workspaceRoot}/build/moduless.js",
-				"args": [
-					"run-set"
-				],
+				"cwd": "${workspaceFolder}/example",
 				"smartStep": true,
 				"sourceMaps": true
 			},
@@ -53,6 +52,7 @@
 				"args": [
 					"run"
 				],
+				"cwd": "${workspaceFolder}/example",
 				"smartStep": true,
 				"sourceMaps": true
 			}
