@@ -23,9 +23,9 @@ namespace Moduless
 			.command("set <location>", "Set a line within a source file to start running (/path/to/file.ts:123)")
 			.action(location =>
 			{
-				let [coverFilePath, lineText] = location.split(":");
+				let [coverFilePath, lineNumText] = location.split(":");
 				let lineIdx = 0;
-				if (!lineText || !(lineIdx = parseInt(lineText, 10)) || lineIdx < 1)
+				if (!lineNumText || !(lineIdx = parseInt(lineNumText, 10)) || lineIdx < 1)
 					return Util.error("Input is expected to be in the form: /path/to/file.ts:123");
 				
 				coverFilePath = Path.resolve(coverFilePath);
