@@ -144,6 +144,10 @@ namespace Moduless
 			else if (Array.isArray(coverResult) || isGenerator(coverResult))
 				for (const checkerFn of coverResult)
 					execChecker(coverFunctionName, checkerFn);
+			
+			else if (isAsyncGenerator(coverResult))
+				for await (const checkerFn of coverResult)
+					await execCheckerAsync(coverFunctionName, checkerFn);
 		}
 		
 		return true;
@@ -159,6 +163,15 @@ namespace Moduless
 	}
 	
 	/** */
+	function isAsyncGenerator(coverResult: any): coverResult is AsyncIterableIterator<any>
+	{
+		return !!coverResult &&
+			typeof coverResult === "object" &&
+			//coverResult[Symbol.toStringTag] === "AsyncGenerator" &&
+			typeof coverResult[Symbol.asyncIterator] === "function";
+	}
+	
+	/** */
 	function execChecker(coverFunctionName: string, checkerFn: () => boolean)
 	{
 		const checkerText = checkerFn.toString().replace(/^\s*\(\)\s*=>\s*/, "");
@@ -166,6 +179,25 @@ namespace Moduless
 		try
 		{
 			const passed = checkerFn();
+			report(passed, coverFunctionName, checkerText);
+		}
+		catch (e)
+		{
+			Util.error(
+				"Checker function: " + checkerText + " generated an error: \n" +
+				"\t" + e.name + ": " + e.message + "\r\n" +
+				e.stack || "(no stack trace)");
+		}
+	}
+	
+	/** */
+	async function execCheckerAsync(coverFunctionName: string, checkerFn: () => boolean)
+	{
+		const checkerText = checkerFn.toString().replace(/^\s*\(\)\s*=>\s*/, "");
+		
+		try
+		{
+			const passed = await checkerFn();
 			report(passed, coverFunctionName, checkerText);
 		}
 		catch (e)

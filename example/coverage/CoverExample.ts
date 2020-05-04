@@ -24,6 +24,14 @@ namespace CoverExample
 		yield () => 2 + 2 === 4;
 	}
 	
+	/** */
+	export async function *coverAsyncGenerator()
+	{
+		yield () => 3 + 3 === 6;
+		await new Promise(r => setTimeout(r));
+		yield () => 4 + 4 === 8;
+	}
+	
 	if (typeof module === "object")
 		module.exports = { CoverExample };
 }

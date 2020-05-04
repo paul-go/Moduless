@@ -38,7 +38,7 @@
 				"request": "launch",
 				"program": "${workspaceRoot}/build/moduless.js",
 				"args": [
-					"set", "./coverage/CoverExample.ts:21"
+					"set", "./coverage/CoverExample.ts:28"
 				],
 				"cwd": "${workspaceFolder}/example",
 				"smartStep": true,
