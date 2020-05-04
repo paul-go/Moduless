@@ -37,6 +37,12 @@ namespace Moduless
 				const specifiedLine = codeFileLines[lineIdx - 1];
 				const coverFunctionName = Util.getCoverNameFromLine(specifiedLine);
 				
+				if (coverFunctionName === "")
+				{
+					console.error("Could not parse the line: " + specifiedLine);
+					return;
+				}
+				
 				Settings.writeSetCoverFunction(coverFilePath, coverFunctionName);
 				console.log(`Moduless will now run ${coverFunctionName}() in ${coverFilePath} by default.`);
 			});

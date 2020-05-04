@@ -70,7 +70,7 @@ namespace Moduless
 		{
 			// Wait 50ms to give the debugger a chance to connect.
 			// This can be a problem with larger projects.
-			await new Promise(r => setTimeout(r, 50));
+			await new Promise(r => setTimeout(r, 90));
 			
 			let hasRunOneFunction = false;
 			
@@ -141,12 +141,21 @@ namespace Moduless
 			else if (typeof coverResult === "function")
 				execChecker(coverFunctionName, coverResult);
 			
-			else if (Array.isArray(coverResult))
+			else if (Array.isArray(coverResult) || isGenerator(coverResult))
 				for (const checkerFn of coverResult)
 					execChecker(coverFunctionName, checkerFn);
 		}
 		
 		return true;
+	}
+	
+	/** */
+	function isGenerator(coverResult: any): coverResult is IterableIterator<any>
+	{
+		return !!coverResult &&
+			typeof coverResult === "object" &&
+			coverResult[Symbol.toStringTag] === "Generator" &&
+			typeof coverResult[Symbol.iterator] === "function";
 	}
 	
 	/** */

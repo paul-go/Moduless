@@ -90,13 +90,13 @@ namespace Moduless
 		 */
 		export function getCoverNameFromLine(lineText: string)
 		{
-			const searchString = "function " + Constants.prefix;
-			const functionStart = lineText.indexOf(searchString);
-			if (functionStart < 0)
+			const searchReg = new RegExp("function(\\s+\\*|\\*\\s+|\\s+\\*\\s+|\\s+)" + Constants.prefix);
+			const functionStart = searchReg.test(lineText);
+			if (!functionStart)
 				return "";
 			
 			return lineText
-				.replace(/^\s*(export\s+)?(async\s+)?(function\s+)/, "")
+				.replace(/^\s*(export\s+)?(async\s+)?(function[\s\*]+)/, "")
 				.replace(/\s*\(\s*\)\s*/, "");
 		}
 		
