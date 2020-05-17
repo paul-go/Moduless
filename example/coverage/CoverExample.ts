@@ -1,5 +1,5 @@
 
-namespace CoverExample
+namespace Cover
 {
 	/** */
 	export function coverCreateProgram()
@@ -33,5 +33,5 @@ namespace CoverExample
 	}
 	
 	if (typeof module === "object")
-		module.exports = { CoverExample };
+		module.exports = { Cover };
 }

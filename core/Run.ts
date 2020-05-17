@@ -44,7 +44,7 @@ namespace Moduless
 			}
 			
 			const requireResult = require(scriptFilePath);
-			if (!requireResult || typeof requireResult !== "object")
+			if (requireResult === undefined || requireResult === null)
 				continue;
 			
 			for (const [key, value] of Object.entries(requireResult))

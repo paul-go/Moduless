@@ -18,7 +18,8 @@
 		"build/modules.js"
 	],
 	"scripts": {
-		"publish": "np"
+		"publish": "np",
+		"build-example": "cd example && tsc --build"
 	},
 	"devDependencies": {
 		"@types/node": "^13.13.2"
