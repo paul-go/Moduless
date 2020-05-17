@@ -44,12 +44,12 @@ namespace Moduless
 			}
 			
 			const requireResult = require(scriptFilePath);
-			if (requireResult === undefined || requireResult === null)
+			if (!requireResult === undefined || typeof requireResult !== "object")
 				continue;
 			
 			for (const [key, value] of Object.entries(requireResult))
 			{
-				if (!value || typeof value !== "object")
+				if (value === undefined || value === null || value !== value)
 					continue;
 				
 				const val = value as Namespace;
