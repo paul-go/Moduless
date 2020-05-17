@@ -55,7 +55,7 @@ namespace Moduless
 				const val = value as Namespace;
 				global[key] = value;
 				
-				if (/^Cover[A-Z]/.test(key))
+				if (/^Cover[A-Z]?/.test(key))
 					coverNamespaces.push(val);
 			}
 		}
