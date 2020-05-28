@@ -68,9 +68,9 @@ namespace Moduless
 		}
 		else
 		{
-			// Wait 50ms to give the debugger a chance to connect.
+			// Wait 100ms to give the debugger a chance to connect.
 			// This can be a problem with larger projects.
-			await new Promise(r => setTimeout(r, 90));
+			await new Promise(r => setTimeout(r, 100));
 			
 			let hasRunOneFunction = false;
 			
@@ -122,6 +122,13 @@ namespace Moduless
 			
 			const coverFunctionName = coverName.replace(coverPrefix, "");
 			let coverResult = coverFunction();
+			
+			if (Moduless.inBrowser &&
+				coverResult && 
+				coverResult instanceof window.Element)
+			{
+				document.body.appendChild(coverResult);
+			}
 			
 			if (coverResult === undefined || coverResult === null)
 			{

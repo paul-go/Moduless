@@ -1,0 +1,13 @@
+{
+	"name": "Moduless Electron",
+	"extends": "../tsconfig.standard.json",
+	"compilerOptions": {
+		"outFile": "../build/moduless-electron.js"
+	},
+	"include": [
+		"**/*.ts"
+	],
+	"references": [
+		
+	]
+}

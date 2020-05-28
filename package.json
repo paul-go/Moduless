@@ -15,7 +15,8 @@
 	"main": "build/moduless.js",
 	"bin": "build/moduless.js",
 	"files": [
-		"build/modules.js"
+		"build/moduless.js",
+		"build/moduless-electron.js"
 	],
 	"scripts": {
 		"publish": "np",

@@ -1,7 +1,16 @@
 
 namespace Moduless
 {
-	setTimeout(() =>
+	/**
+	 * Global constant that indicates whether we're running in a browser
+	 * (or more specifically, an Electron window).
+	 */
+	export const inBrowser = 
+		typeof window === "object" &&
+		String(window.alert) === "function alert() { [native code] }";
+	
+	/** */
+	function runFromCommandLine()
 	{
 		Cli
 			.command("", "Run the cover function that was set previously.")
@@ -50,7 +59,7 @@ namespace Moduless
 		
 		Cli.help();
 		Cli.parse();
-	});
+	}
 	
 	/** */
 	async function run(coverFunctionName = "")
@@ -59,4 +68,12 @@ namespace Moduless
 		await Moduless.run(projectPath, coverFunctionName);
 		Util.separate();
 	}
+	
+	//
+	setTimeout(() =>
+	{
+		inBrowser ?
+			run() :
+			runFromCommandLine();
+	});
 }

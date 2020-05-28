@@ -55,6 +55,19 @@
 				"cwd": "${workspaceFolder}/example",
 				"smartStep": true,
 				"sourceMaps": true
+			},
+			{
+				"name": "Debug 'run' in Electron",
+				"type": "node",
+				"request": "launch",
+				"cwd": "${workspaceFolder}/example",
+				"runtimeExecutable": "electron",
+				"program": "${workspaceRoot}/build/moduless-electron.js",
+				"args": [
+					"run"
+				],
+				"smartStep": true,
+				"sourceMaps": true
 			}
 		]
 	},
