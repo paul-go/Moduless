@@ -54,7 +54,6 @@ namespace Moduless
 				console.log(`Moduless will now run ${coverFunctionName}() in ${coverFilePath} by default.`);
 			});
 		
-		
 		Cli.help();
 		Cli.parse();
 	}
