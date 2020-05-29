@@ -16,9 +16,7 @@ namespace Moduless
 			.command("", "Run the cover function that was set previously.")
 			.action(async () =>
 			{
-				const cwd = process.cwd();
-				const coverFunctionName = Settings.readSetCoverFunction(cwd);
-				await run(coverFunctionName);
+				await runAssigned();
 			});
 		
 		Cli
@@ -62,6 +60,14 @@ namespace Moduless
 	}
 	
 	/** */
+	async function runAssigned()
+	{
+		const cwd = process.cwd();
+		const coverFunctionName = Settings.readSetCoverFunction(cwd);
+		await run(coverFunctionName);
+	}
+	
+	/** */
 	async function run(coverFunctionName = "")
 	{
 		const projectPath = process.cwd();
@@ -73,7 +79,7 @@ namespace Moduless
 	setTimeout(() =>
 	{
 		inBrowser ?
-			run() :
+			runAssigned() :
 			runFromCommandLine();
 	});
 }
