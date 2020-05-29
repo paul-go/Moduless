@@ -9,7 +9,7 @@ namespace Moduless
 			return new Promise<boolean>(r =>
 			{
 				const script = document.createElement("script");
-				script.src = scriptUrl;
+				script.src = "file://" + scriptUrl;
 				script.onload = () => r(true);
 				script.onerror = () => r(false);
 				document.head.appendChild(script);
