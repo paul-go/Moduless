@@ -3,19 +3,6 @@ namespace Moduless
 {
 	export namespace Util
 	{
-		/** */
-		export async function importScript(scriptUrl: string)
-		{
-			return new Promise<boolean>(r =>
-			{
-				const script = document.createElement("script");
-				script.src = "file://" + scriptUrl;
-				script.onload = () => r(true);
-				script.onerror = () => r(false);
-				document.head.appendChild(script);
-			});
-		}
-		
 		/**
 		 * Parses a TypeScript configuration file (typically called "tsconfig.json"),
 		 * and returns an object containing the relevant information.
