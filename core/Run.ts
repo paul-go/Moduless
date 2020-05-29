@@ -36,27 +36,7 @@ namespace Moduless
 		const global: any = globalThis;
 		const coverReg = /^Cover[A-Z]?/;
 		
-		if (Moduless.inBrowser)
-		{
-			for await (const scriptFilePath of scriptFilePaths)
-			{
-				const loaded = await Util.importScript(scriptFilePath);
-				if (!loaded)
-					throw new Error("Script not loaded: " + scriptFilePath);
-			}
-			
-			for (const [key, value] of Object.entries(window as any))
-			{
-				if (typeof value !== "object" && typeof value !== "function")
-					continue;
-				
-				if (!coverReg.test(key))
-					continue;
-				
-				coverNamespaces.push(value as Namespace);
-			}
-		}
-		else for (const scriptFilePath of scriptFilePaths)
+		for (const scriptFilePath of scriptFilePaths)
 		{
 			if (!Fs.existsSync(scriptFilePath))
 			{
