@@ -131,9 +131,16 @@ namespace Moduless
 					document.body.appendChild(coverResult);
 				
 				else if (Array.isArray(coverResult))
-					for (const element of coverResult)
+				{
+					for (const [idx, element] of coverResult.entries())
+					{
 						if (element instanceof window.Element)
+						{
 							document.body.appendChild(element);
+							coverResult.splice(idx, 1);
+						}
+					}
+				}
 			}
 			
 			if (coverResult === undefined || coverResult === null)
