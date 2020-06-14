@@ -132,7 +132,9 @@ namespace Moduless
 				
 				else if (Array.isArray(coverResult))
 				{
-					for (const [idx, element] of coverResult.entries())
+					const entries = Array.from(coverResult.entries());
+					
+					for (const [idx, element] of entries)
 					{
 						if (element instanceof window.Element)
 						{
