@@ -6,6 +6,7 @@ namespace Moduless
 		undefined |
 		Error | 
 		boolean |
+		Element |
 		(() => boolean) |
 		(() => boolean)[];
 	
@@ -124,11 +125,15 @@ namespace Moduless
 			const coverFunctionName = coverName.replace(coverPrefix, "");
 			let coverResult = coverFunction();
 			
-			if (Moduless.inBrowser &&
-				coverResult && 
-				coverResult instanceof window.Element)
+			if (Moduless.inBrowser && coverResult)
 			{
-				document.body.appendChild(coverResult);
+				if (coverResult instanceof window.Element)
+					document.body.appendChild(coverResult);
+				
+				else if (Array.isArray(coverResult))
+					for (const element of coverResult)
+						if (element instanceof window.Element)
+							document.body.appendChild(element);
 			}
 			
 			if (coverResult === undefined || coverResult === null)
