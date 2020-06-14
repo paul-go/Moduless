@@ -132,14 +132,13 @@ namespace Moduless
 				
 				else if (Array.isArray(coverResult))
 				{
-					const entries = Array.from(coverResult.entries());
-					
-					for (const [idx, element] of entries)
+					for (let i = coverResult.length; i-- > 0;)
 					{
+						const element = coverResult[i];
 						if (element instanceof window.Element)
 						{
-							document.body.appendChild(element);
-							coverResult.splice(idx, 1);
+							document.body.prepend(element);
+							coverResult.splice(i, 1);
 						}
 					}
 				}
