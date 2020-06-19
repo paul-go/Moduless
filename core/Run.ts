@@ -125,6 +125,15 @@ namespace Moduless
 			const coverFunctionName = coverName.replace(coverPrefix, "");
 			let coverResult = coverFunction();
 			
+			if (coverResult === undefined || coverResult === null)
+			{
+				report(true, coverFunctionName);
+				continue;
+			}
+			
+			if (coverResult instanceof Promise)
+				coverResult = await coverResult;
+			
 			if (Moduless.inBrowser && coverResult)
 			{
 				if (coverResult instanceof window.Element)
@@ -144,16 +153,7 @@ namespace Moduless
 				}
 			}
 			
-			if (coverResult === undefined || coverResult === null)
-			{
-				report(true, coverFunctionName);
-				continue;
-			}
-			
-			if (coverResult instanceof Promise)
-				coverResult = await coverResult;
-			
-			if (coverResult === true)
+			else if (coverResult === true)
 				report(true, coverFunctionName);
 			
 			else if (coverResult === false)

@@ -46,7 +46,11 @@ namespace Moduless
 			if (Fs.existsSync(settingFilePath))
 			{
 				const jsonText = Fs.readFileSync(settingFilePath).toString("utf8");
-				return JSON.parse(jsonText);
+				try
+				{
+					return JSON.parse(jsonText);
+				}
+				catch (e) { }
 			}
 			
 			return null;
