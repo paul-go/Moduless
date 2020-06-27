@@ -26,39 +26,61 @@ namespace Moduless
 		if (coverFunctionName === "")
 			Util.log("Running all discoverable cover functions.");
 		
-		const graph = new ProjectGraph(cwd);
-		const scriptFilePaths: string[] = [];
-		
-		for (const project of graph.eachProject())
-			if (project.outFile !== "")
-				scriptFilePaths.push(project.outFile);
-		
-		const coverNamespaces: Namespace[] = [];
 		const global: any = globalThis;
+		const coverNamespaces: Namespace[] = [];
 		const coverReg = /^Cover[A-Z]?/;
 		
-		for (const scriptFilePath of scriptFilePaths)
+		// In the case when there is already a cover function namespace
+		// found in the global scope, we skip the loading of the project
+		// reference scripts, because we assume that the references
+		// have already been loaded by another means.
+		for (const key of Object.keys(global))
 		{
-			if (!Fs.existsSync(scriptFilePath))
-			{
-				Util.error("File not found: " + scriptFilePath);
-				continue;
-			}
-			
-			const requireResult = require(scriptFilePath);
-			if (!requireResult || typeof requireResult !== "object")
+			// Avoid accessing members that whose names aren't
+			// compliant with the expected format.
+			if (!coverReg.test(key))
 				continue;
 			
-			for (const [key, value] of Object.entries(requireResult))
+			const value = global[key];
+			if (value === undefined || value === null || value !== value)
+				continue;
+			
+			if (coverReg.test(key) && typeof value === "object")
+				coverNamespaces.push(value as Namespace);
+		}
+		
+		if (coverNamespaces.length === 0)
+		{
+			const graph = new ProjectGraph(cwd);
+			const scriptFilePaths: string[] = [];
+			
+			for (const project of graph.eachProject())
+				if (project.outFile !== "")
+					scriptFilePaths.push(project.outFile);
+			
+			for (const scriptFilePath of scriptFilePaths)
 			{
-				if (value === undefined || value === null || value !== value)
+				if (!Fs.existsSync(scriptFilePath))
+				{
+					Util.error("File not found: " + scriptFilePath);
+					continue;
+				}
+				
+				const requireResult = require(scriptFilePath);
+				if (!requireResult || typeof requireResult !== "object")
 					continue;
 				
-				const val = value as Namespace;
-				global[key] = value;
-				
-				if (coverReg.test(key))
-					coverNamespaces.push(val);
+				for (const [key, value] of Object.entries(requireResult))
+				{
+					if (value === undefined || value === null || value !== value)
+						continue;
+					
+					const val = value as Namespace;
+					global[key] = value;
+					
+					if (coverReg.test(key))
+						coverNamespaces.push(val);
+				}
 			}
 		}
 		

@@ -1,6 +1,7 @@
 
 namespace Moduless
 {
+	/** @internal */
 	export interface Paths
 	{
 		/**
@@ -77,6 +78,7 @@ namespace Moduless
 		};
 	};
 	
+	/** @internal */
 	export const EnvPaths = (() =>
 	{
 		const appName = "com.truebase.Moduless";
@@ -89,6 +91,4 @@ namespace Moduless
 		
 		return linux(appName);
 	})();
-	
-	
 }

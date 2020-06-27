@@ -2,6 +2,7 @@
 namespace Moduless
 {
 	/**
+	 * @internal
 	 * Global constant that indicates whether we're running in a browser
 	 * (or more specifically, an Electron window).
 	 */
@@ -12,21 +13,24 @@ namespace Moduless
 	/** */
 	function runFromCommandLine()
 	{
-		Cli
+		const cli =  require("cac")() as 
+			ReturnType<typeof import("../node_modules/cac/types/index").cac>;
+		
+		cli
 			.command("", "Run the cover function that was set previously.")
 			.action(async () =>
 			{
 				await runAssigned();
 			});
 		
-		Cli
+		cli
 			.command("run", "Run all cover functions in series.")
 			.action(async () =>
 			{
 				await run();
 			});
 		
-		Cli
+		cli
 			.command("set <location>", "Set a line within a source file to start running (/path/to/file.ts:123)")
 			.action(location =>
 			{
@@ -54,8 +58,8 @@ namespace Moduless
 				console.log(`Moduless will now run ${coverFunctionName}() in ${coverFilePath} by default.`);
 			});
 		
-		Cli.help();
-		Cli.parse();
+		cli.help();
+		cli.parse();
 	}
 	
 	/** */

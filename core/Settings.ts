@@ -2,6 +2,7 @@
 namespace Moduless
 {
 	/**
+	 * @internal
 	 * A wrapper that manages Moduless's settings that are
 	 * stored on disk.
 	 */

@@ -1,6 +1,9 @@
 
 namespace Moduless
 {
+	/**
+	 * @internal
+	 */
 	export namespace Util
 	{
 		/**

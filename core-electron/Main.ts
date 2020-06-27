@@ -1,7 +1,7 @@
 
 namespace Moduless
 {
-	export const Electron = require("electron");// as typeof import("electron");
+	export const Electron = require("electron");
 	export const Fs = require("fs") as typeof import("fs");
 	export const Path = require("path") as typeof import("path");
 	
