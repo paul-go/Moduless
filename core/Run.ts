@@ -175,7 +175,7 @@ namespace Moduless
 				}
 			}
 			
-			else if (coverResult === true)
+			if (coverResult === true)
 				report(true, coverFunctionName);
 			
 			else if (coverResult === false)
