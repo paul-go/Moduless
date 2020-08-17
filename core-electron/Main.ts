@@ -7,10 +7,10 @@ namespace Moduless
 	
 	(async () =>
 	{
-		// We're waiting for 100ms here so that we can give time
+		// We're waiting for 500ms here so that we can give time
 		// for the debugger to attach, in the case when we're in
 		// debug mode.
-		await new Promise(r => setTimeout(r, 100));
+		await new Promise(r => setTimeout(r, 500));
 		
 		const [x, y] = Settings.lastWindowPosition;
 		const [width, height] = Settings.lastWindowSize;

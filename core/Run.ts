@@ -92,9 +92,9 @@ namespace Moduless
 		}
 		else
 		{
-			// Wait 100ms to give the debugger a chance to connect.
+			// Wait 500ms to give the debugger a chance to connect.
 			// This can be a problem with larger projects.
-			await new Promise(r => setTimeout(r, 100));
+			await new Promise(r => setTimeout(r, 500));
 			
 			let hasRunOneFunction = false;
 			
