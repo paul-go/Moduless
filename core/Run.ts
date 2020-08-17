@@ -70,20 +70,27 @@ namespace Moduless
 					continue;
 				}
 				
-				const requireResult = require(scriptFilePath);
-				if (!requireResult || typeof requireResult !== "object")
-					continue;
-				
-				for (const [key, value] of Object.entries(requireResult))
+				try
 				{
-					if (value === undefined || value === null || value !== value)
+					const requireResult = require(scriptFilePath);
+					if (!requireResult || typeof requireResult !== "object")
 						continue;
 					
-					const val = value as Namespace;
-					global[key] = value;
-					
-					if (coverReg.test(key))
-						coverNamespaces.push(val);
+					for (const [key, value] of Object.entries(requireResult))
+					{
+						if (value === undefined || value === null || value !== value)
+							continue;
+						
+						const val = value as Namespace;
+						global[key] = value;
+						
+						if (coverReg.test(key))
+							coverNamespaces.push(val);
+					}
+				}
+				catch (e)
+				{
+					console.log(e);
 				}
 			}
 		}
