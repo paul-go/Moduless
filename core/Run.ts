@@ -23,6 +23,10 @@ namespace Moduless
 		cwd = process.cwd(),
 		coverFunctionName: string = "")
 	{
+		// Wait 500ms to give the debugger a chance to connect.
+		// This can be a problem with larger projects.
+		await new Promise(r => setTimeout(r, 500));
+		
 		if (coverFunctionName === "")
 			Util.log("Running all discoverable cover functions.");
 		
@@ -92,10 +96,6 @@ namespace Moduless
 		}
 		else
 		{
-			// Wait 500ms to give the debugger a chance to connect.
-			// This can be a problem with larger projects.
-			await new Promise(r => setTimeout(r, 500));
-			
 			let hasRunOneFunction = false;
 			
 			for await (const ns of coverNamespaces)
