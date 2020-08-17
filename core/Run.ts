@@ -73,8 +73,13 @@ namespace Moduless
 				try
 				{
 					const requireResult = require(scriptFilePath);
-					if (!requireResult || typeof requireResult !== "object")
+					if (!requireResult || 
+						typeof requireResult !== "object" ||
+						Object.keys(requireResult).length === 0)
+					{
+						console.warn("Project at " + scriptFilePath + " has no export.");
 						continue;
+					}
 					
 					for (const [key, value] of Object.entries(requireResult))
 					{
