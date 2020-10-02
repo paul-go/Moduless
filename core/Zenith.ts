@@ -24,10 +24,17 @@ namespace Moduless
 			});
 		
 		cli
-			.command("run", "Run all cover functions in series.")
+			.command("all", "Run all cover functions in series.")
 			.action(async () =>
 			{
 				await run();
+			});
+		
+		cli
+			.command("call", "Run a specific cover function by name.")
+			.action(async (functionName: string) =>
+			{
+				await run(functionName);
 			});
 		
 		cli
