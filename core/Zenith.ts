@@ -27,14 +27,16 @@ namespace Moduless
 			.command("all", "Run all cover functions in series.")
 			.action(async () =>
 			{
+				console.log("Running all discoverable cover functions");
 				await run();
 			});
 		
 		cli
-			.command("call", "Run a specific cover function by name.")
-			.action(async (functionName: string) =>
+			.command("call <function_name>", "Run a specific cover function by name.")
+			.action(async (function_name: string) =>
 			{
-				await run(functionName);
+				console.log("Running cover function: " + function_name);
+				await run(function_name);
 			});
 		
 		cli
