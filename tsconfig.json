@@ -2,7 +2,6 @@
 	"files": [],
 	"include": [],
 	"references": [
-		{ "path": "./core" },
-		{ "path": "./core-electron" }
+		{ "path": "./core" }
 	]
 }

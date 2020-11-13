@@ -23,7 +23,8 @@
 		"build-example": "cd example && tsc --build"
 	},
 	"devDependencies": {
-		"@types/node": "^13.13.2"
+		"@types/node": "^13.13.2",
+		"electron": "^10.1.5"
 	},
 	"dependencies": {
 		"cac": "^6.5.8"

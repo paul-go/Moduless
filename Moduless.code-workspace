@@ -45,26 +45,45 @@
 				"sourceMaps": true
 			},
 			{
-				"name": "Debug 'run' in NodeJS",
+				"name": "Debug 'run assigned' in NodeJS",
+				"type": "node",
+				"request": "launch",
+				"program": "${workspaceRoot}/build/moduless.js",
+				"cwd": "${workspaceFolder}/example",
+				"smartStep": true,
+				"sourceMaps": true
+			},
+			{
+				"name": "Debug 'run assigned' in Electron",
+				"type": "node",
+				"request": "launch",
+				"cwd": "${workspaceFolder}/example",
+				"runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron",
+				"program": "${workspaceRoot}/build/moduless.js",
+				"smartStep": true,
+				"sourceMaps": true
+			},
+			{
+				"name": "Debug 'run all' in NodeJS",
 				"type": "node",
 				"request": "launch",
 				"program": "${workspaceRoot}/build/moduless.js",
 				"args": [
-					"run"
+					"all"
 				],
 				"cwd": "${workspaceFolder}/example",
 				"smartStep": true,
 				"sourceMaps": true
 			},
 			{
-				"name": "Debug 'run' in Electron",
+				"name": "Debug 'run all' in Electron",
 				"type": "node",
 				"request": "launch",
 				"cwd": "${workspaceFolder}/example",
-				"runtimeExecutable": "electron",
-				"program": "${workspaceRoot}/build/moduless-electron.js",
+				"runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron",
+				"program": "${workspaceRoot}/build/moduless.js",
 				"args": [
-					"run"
+					"all"
 				],
 				"smartStep": true,
 				"sourceMaps": true

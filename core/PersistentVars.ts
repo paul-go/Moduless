@@ -2,9 +2,9 @@
 namespace Moduless
 {
 	/**
-	 * Storable application settings that are auto-persisted to disk when updated.
+	 * Storable variables that are auto-persisted to disk when updated.
 	 */
-	export class Settings
+	export class PersistentVars
 	{
 		/** */
 		static get lastWindowPosition()
@@ -13,12 +13,12 @@ namespace Moduless
 				return this._lastWindowPosition;
 			
 			return this._lastWindowPosition = 
-				this.readSetting("last-window-position") || 
+				this.readVar("last-window-position") || 
 				[0, 0];
 		}
 		static set lastWindowPosition(value: number[])
 		{
-			this.writeSetting("last-window-position", value);
+			this.writeVar("last-window-position", value);
 		}
 		private static _lastWindowPosition: number[] | null = null;
 		
@@ -29,23 +29,23 @@ namespace Moduless
 				return this._lastWindowSize;
 			
 			return this._lastWindowSize = 
-				this.readSetting("last-window-size") || 
+				this.readVar("last-window-size") || 
 				[1200, 1000];
 		}
 		static set lastWindowSize(value: number[])
 		{
-			this.writeSetting("last-window-size", value);
+			this.writeVar("last-window-size", value);
 		}
 		private static _lastWindowSize: number[] | null = null;
 		
 		/** */
-		private static readSetting(settingName: string)
+		private static readVar(varName: string)
 		{
-			const settingFilePath = this.getSettingPath(settingName);
+			const varFilePath = this.getVarPath(varName);
 			
-			if (Fs.existsSync(settingFilePath))
+			if (Fs.existsSync(varFilePath))
 			{
-				const jsonText = Fs.readFileSync(settingFilePath).toString("utf8");
+				const jsonText = Fs.readFileSync(varFilePath).toString("utf8");
 				try
 				{
 					return JSON.parse(jsonText);
@@ -57,31 +57,31 @@ namespace Moduless
 		}
 		
 		/** */
-		private static writeSetting(settingName: string, value: any)
+		private static writeVar(varName: string, value: any)
 		{
 			if (value === null)
 				return;
 			
-			const settingFilePath = this.getSettingPath(settingName);
-			Fs.writeFile(settingFilePath, JSON.stringify(value), { flag: "w" }, () => {});
+			const varFilePath = this.getVarPath(varName);
+			Fs.writeFile(varFilePath, JSON.stringify(value), { flag: "w" }, () => {});
 		}
 		
 		/** */
-		private static getSettingPath(settingName: string)
+		private static getVarPath(varName: string)
 		{
 			const appPath = Path.join(
 				Electron.app.getPath("appData"),
 				"com.truebase.Moduless");
 			
-			const settingsPath = Path.join(appPath, "settings");
+			const varsPath = Path.join(appPath, "vars");
 			
 			if (!Fs.existsSync(appPath))
 				Fs.mkdirSync(appPath);
 			
-			if (!Fs.existsSync(settingsPath))
-				Fs.mkdirSync(settingsPath);
+			if (!Fs.existsSync(varsPath))
+				Fs.mkdirSync(varsPath);
 			
-			return Path.join(settingsPath, settingName);
+			return Path.join(varsPath, varName);
 		}
 	}
 }

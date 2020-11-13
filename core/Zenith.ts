@@ -1,15 +1,6 @@
 
 namespace Moduless
 {
-	/**
-	 * @internal
-	 * Global constant that indicates whether we're running in a browser
-	 * (or more specifically, an Electron window).
-	 */
-	export const inBrowser = 
-		typeof window === "object" &&
-		String(window.alert) === "function alert() { [native code] }";
-	
 	/** */
 	function runFromCommandLine()
 	{
@@ -24,11 +15,12 @@ namespace Moduless
 			});
 		
 		cli
-			.command("all", "Run all cover functions in series.")
-			.action(async () =>
+			.command("all <regular_expression>", 
+				"Run many cover functions in series, optionally filtering by those " +
+				"whose function names conform to a regular expression.")
+			.action(async (regular_expression: string) =>
 			{
-				console.log("Running all discoverable cover functions");
-				await run();
+				await runAll(regular_expression || "");
 			});
 		
 		cli
@@ -80,18 +72,156 @@ namespace Moduless
 	}
 	
 	/** */
-	async function run(coverFunctionName = "")
+	async function runAll(regexStr: string)
+	{
+		if (regexStr)
+		{
+			console.log("Running cover functions conforming to: " + regexStr);
+			const regExp = new RegExp(regexStr);
+			await run(regExp);
+		}
+		
+		console.log("Running all discoverable cover functions");
+		await run();
+	}
+	
+	/** */
+	async function run(coverFunctionName: RegExp | string = "")
 	{
 		const projectPath = process.cwd();
 		await Moduless.run(projectPath, coverFunctionName);
 		Util.separate();
 	}
 	
+	/** */
+	const enum RunGroup
+	{
+		/** Run all cover functions. */
+		all,
+		/** Run the assigned cover function. */
+		assigned,
+		/** Run all cover functions whose name conform to a regular expression. */
+		some
+	}
+	
 	//
 	setTimeout(() =>
 	{
-		inBrowser ?
-			runAssigned() :
+		if (inElectronMain)
+			execElectronBootstrapper();
+		
+		else if (inNode)
 			runFromCommandLine();
+		
+		else if (inBrowser)
+		{
+			const parsed = parseQueryString();
+			
+			if (parsed === RunGroup.all)
+				run();
+				
+			else if (parsed === RunGroup.assigned)
+				runAssigned();
+			
+			else
+				runAll(parsed);
+		}
 	});
+	
+	/** */
+	async function execElectronBootstrapper()
+	{
+		await new Promise<void>(r =>
+		{
+			(function isReady()
+			{
+				if (Electron.app.isReady())
+					r();
+				else
+					setTimeout(isReady, 5);
+			})();
+		});
+		
+		const [x, y] = PersistentVars.lastWindowPosition;
+		const [width, height] = PersistentVars.lastWindowSize;
+		
+		const window = new Electron.BrowserWindow({
+			title: "Moduless",
+			acceptFirstMouse: true,
+			alwaysOnTop: true,
+			enableLargerThanScreen: true,
+			x,
+			y,
+			width,
+			height,
+			webPreferences: {
+				enableRemoteModule: true,
+				nodeIntegration: true,
+				webSecurity: false,
+				devTools: true
+			}
+		});
+		
+		window.on("moved", () =>
+		{
+			PersistentVars.lastWindowPosition = window.getPosition();
+		});
+		
+		window.on("resize", () =>
+		{
+			PersistentVars.lastWindowSize = window.getSize();
+		});
+		
+		// Electron is caching scripts loaded from the debug HTTP server
+		// fairly aggressively, so we clear everything here.
+		window.webContents.session.clearCache();
+		window.webContents.session.clearHostResolverCache();
+		
+		const indexFile = [
+			`<!DOCTYPE html>`,
+			// Eliminate Electron's console generated garbage
+			`<script>console.clear();</script>`,
+			`<script src="${__dirname}/moduless.js"></script>`,
+		].join("\n");
+		
+		const indexPath = __dirname + "/index.html" + composeQueryString();
+		Fs.writeFileSync(indexPath, indexFile);
+		await window.webContents.loadURL("file://" + indexPath);
+	}
+	
+	const expressionPrefix = "expression=";
+	
+	/** */
+	function composeQueryString()
+	{
+		if (process.argv.includes("all"))
+			return "?all";
+		
+		const expressionArg = process.argv.find(arg => arg.startsWith(expressionPrefix));
+		if (expressionArg)
+			return "?" + expressionArg;
+		
+		// Defaults to running the assigned cover function.
+		return "";
+	}
+	
+	/**
+	 * Returns 
+	 */
+	function parseQueryString()
+	{
+		const query = window.location.search;
+		
+		if (query === "?all")
+			return RunGroup.all;
+		
+		if (query.startsWith("?" + expressionPrefix))
+		{
+			const regularExpressionEnc = query.slice(expressionPrefix.length + 1);
+			const regularExpressionText = decodeURIComponent(regularExpressionEnc);
+			return regularExpressionText;
+		}
+		
+		return RunGroup.assigned;
+	}
 }
