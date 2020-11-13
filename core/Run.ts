@@ -199,13 +199,16 @@ namespace Moduless
 			return false;
 		
 		for (const [coverName, coverFunction] of coverEntries)
-			await runSingleCover(coverName, coverFunction);
+			await runSingleCover(coverNamespace, coverName, coverFunction);
 		
 		return true;
 	}
 	
 	/** */
-	export async function runSingleCover(coverName: string, coverFunction: CoverFn)
+	export async function runSingleCover(
+		coverNamespace: Namespace,
+		coverName: string,
+		coverFunction: CoverFn)
 	{
 		if (typeof coverFunction !== "function")
 			return;
@@ -261,7 +264,7 @@ namespace Moduless
 			for await (const checkerFn of coverResult)
 				await execCheckerAsync(coverFunctionName, checkerFn);
 		
-		maybeRunEnvironmentReset();
+		maybeRunEnvironmentReset(coverNamespace);
 	}
 	
 	/** */
@@ -340,12 +343,12 @@ namespace Moduless
 	 * and runs this function if it exists. The environment reset function needs to
 	 * be named "modulessReset"
 	 */
-	function maybeRunEnvironmentReset()
+	function maybeRunEnvironmentReset(ns: Namespace)
 	{
-		const envResetFn = global["modulessReset"] as Function;
-		if (typeof envResetFn !== "function")
+		const resetFn = ns["modulessReset"] as Function;
+		if (typeof resetFn !== "function")
 			return;
 		
-		envResetFn();
+		resetFn();
 	}
 }

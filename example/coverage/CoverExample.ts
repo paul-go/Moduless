@@ -44,6 +44,12 @@ namespace Cover
 		return () => 2 + 2 === 4;
 	}
 	
+	/** */
+	export function modulessReset()
+	{
+		console.log("Environment reset function run.");
+	}
+	
 	if (typeof module === "object")
 		module.exports = { Cover };
 }
