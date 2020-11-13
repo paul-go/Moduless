@@ -184,9 +184,10 @@ namespace Moduless
 			`<script src="${__dirname}/moduless.js"></script>`,
 		].join("\n");
 		
-		const indexPath = __dirname + "/index.html" + composeQueryString();
+		const indexPath = __dirname + "/index.html";
 		Fs.writeFileSync(indexPath, indexFile);
-		await window.webContents.loadURL("file://" + indexPath);
+		const url = "file://" + indexPath + composeQueryString();
+		await window.webContents.loadURL(url);
 	}
 	
 	const expressionPrefix = "expression=";

@@ -28,9 +28,9 @@ namespace Moduless
 		cwd = process.cwd(),
 		coverFunctionName: RegExp | string = "")
 	{
-		// Wait 500ms to give the debugger a chance to connect.
+		// Wait 1600ms to give the debugger a chance to connect.
 		// This can be a problem with larger projects.
-		await new Promise(r => setTimeout(r, 500));
+		await new Promise(r => setTimeout(r, 1600));
 		
 		if (coverFunctionName === "")
 			Util.log("Running all discoverable cover functions.");
