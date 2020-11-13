@@ -87,6 +87,19 @@
 				],
 				"smartStep": true,
 				"sourceMaps": true
+			},
+			{
+				"name": "Debug 'run from expression' in Electron",
+				"type": "node",
+				"request": "launch",
+				"cwd": "${workspaceFolder}/example",
+				"runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron",
+				"program": "${workspaceRoot}/build/moduless.js",
+				"args": [
+					"expression=coverExpression\\d"
+				],
+				"smartStep": true,
+				"sourceMaps": true
 			}
 		]
 	},

@@ -32,6 +32,12 @@ namespace Moduless
 		// This can be a problem with larger projects.
 		await new Promise(r => setTimeout(r, 1600));
 		
+		if (Moduless.inElectronRender)
+		{
+			// Eliminate Electron's console generated garbage
+			console.clear();
+		}
+		
 		if (coverFunctionName === "")
 			Util.log("Running all discoverable cover functions.");
 		
@@ -192,7 +198,7 @@ namespace Moduless
 		if (coverEntries.length === 0)
 			return false;
 		
-		for await (const [coverName, coverFunction] of coverEntries)
+		for (const [coverName, coverFunction] of coverEntries)
 			await runSingleCover(coverName, coverFunction);
 		
 		return true;

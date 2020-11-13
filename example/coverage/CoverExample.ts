@@ -32,6 +32,18 @@ namespace Cover
 		yield () => 4 + 4 === 8;
 	}
 	
+	/** */
+	export function coverExpression1()
+	{
+		return () => 1 + 1 === 2;
+	}
+	
+	/** */
+	export function coverExpression2()
+	{
+		return () => 2 + 2 === 4;
+	}
+	
 	if (typeof module === "object")
 		module.exports = { Cover };
 }

@@ -80,9 +80,11 @@ namespace Moduless
 			const regExp = new RegExp(regexStr);
 			await run(regExp);
 		}
-		
-		console.log("Running all discoverable cover functions");
-		await run();
+		else
+		{
+			console.log("Running all discoverable cover functions");
+			await run();
+		}
 	}
 	
 	/** */
@@ -179,8 +181,6 @@ namespace Moduless
 		
 		const indexFile = [
 			`<!DOCTYPE html>`,
-			// Eliminate Electron's console generated garbage
-			`<script>console.clear();</script>`,
 			`<script src="${__dirname}/moduless.js"></script>`,
 		].join("\n");
 		
@@ -200,14 +200,18 @@ namespace Moduless
 		
 		const expressionArg = process.argv.find(arg => arg.startsWith(expressionPrefix));
 		if (expressionArg)
-			return "?" + expressionArg;
+		{
+			const key = expressionPrefix;
+			const value = encodeURIComponent(expressionArg.slice(key.length));
+			return "?" + key + value;
+		}
 		
 		// Defaults to running the assigned cover function.
 		return "";
 	}
 	
 	/**
-	 * Returns 
+	 * 
 	 */
 	function parseQueryString()
 	{
