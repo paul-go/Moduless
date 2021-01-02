@@ -87,13 +87,13 @@ namespace Moduless
 		}
 		
 		/**
-		 * Returns the name of the cover function at the specified line,
-		 * or an empty string in the case when the specified line does not
-		 * define a cover function.
+		 * Returns the name of the function at the specified line,
+		 * or an empty string in the case when the specified line 
+		 * does not define a function.
 		 */
-		export function getCoverNameFromLine(lineText: string)
+		export function getFunctionNameFromLine(lineText: string)
 		{
-			const searchReg = new RegExp("function(\\s+\\*|\\*\\s+|\\s+\\*\\s+|\\s+)" + Constants.prefix);
+			const searchReg = new RegExp("function(\\s+\\*|\\*\\s+|\\s+\\*\\s+|\\s+)");
 			const functionStart = searchReg.test(lineText);
 			if (!functionStart)
 				return "";

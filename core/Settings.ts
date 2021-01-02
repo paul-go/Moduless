@@ -9,9 +9,9 @@ namespace Moduless
 	export namespace Settings
 	{
 		/**
-		 * 
+		 * Reads the name of the function to run.
 		 */
-		export function readSetCoverFunction(projectCwd: string)
+		export function readSetFunction(projectCwd: string)
 		{
 			const config = readConfigFile();
 			
@@ -50,14 +50,14 @@ namespace Moduless
 		}
 		
 		/**
-		 * 
+		 * Stores the name of the function to run.
 		 */
-		export function writeSetCoverFunction(
-			coverFunctionFilePath: string,
-			coverFunctionName: string)
+		export function writeSetFunctionName(
+			functionFilePath: string,
+			functionName: string)
 		{
 			const config = readConfigFile();
-			config.push([coverFunctionFilePath, coverFunctionName]);
+			config.push([functionFilePath, functionName]);
 			writeConfigFile(config);
 		}
 		

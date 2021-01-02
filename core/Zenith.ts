@@ -47,16 +47,16 @@ namespace Moduless
 				const codeFileText = Fs.readFileSync(coverFilePath).toString("utf8");
 				const codeFileLines = codeFileText.split("\n");
 				const specifiedLine = codeFileLines[lineIdx - 1];
-				const coverFunctionName = Util.getCoverNameFromLine(specifiedLine);
+				const functionName = Util.getFunctionNameFromLine(specifiedLine);
 				
-				if (coverFunctionName === "")
+				if (functionName === "")
 				{
 					console.error("Could not parse the line: " + specifiedLine);
 					return;
 				}
 				
-				Settings.writeSetCoverFunction(coverFilePath, coverFunctionName);
-				console.log(`Moduless will now run ${coverFunctionName}() in ${coverFilePath} by default.`);
+				Settings.writeSetFunctionName(coverFilePath, functionName);
+				console.log(`Moduless will now run ${functionName}() in ${coverFilePath} by default.`);
 			});
 		
 		cli.help();
@@ -67,7 +67,7 @@ namespace Moduless
 	async function runAssigned()
 	{
 		const cwd = process.cwd();
-		const coverFunctionName = Settings.readSetCoverFunction(cwd);
+		const coverFunctionName = Settings.readSetFunction(cwd);
 		await run(coverFunctionName);
 	}
 	
