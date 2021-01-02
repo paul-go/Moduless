@@ -261,7 +261,7 @@ namespace Moduless
 			for await (const checkerFn of coverResult)
 				await execCheckerAsync(coverFunctionName, checkerFn);
 		
-		maybeRunEnvironmentReset(coverNamespace);
+		await maybeRunEnvironmentReset(coverNamespace);
 	}
 	
 	/** */
@@ -340,12 +340,15 @@ namespace Moduless
 	 * and runs this function if it exists. The environment reset function needs to
 	 * be named "modulessReset"
 	 */
-	function maybeRunEnvironmentReset(ns: Namespace)
+	async function maybeRunEnvironmentReset(ns: Namespace)
 	{
 		const resetFn = ns["modulessReset"] as Function;
 		if (typeof resetFn !== "function")
 			return;
 		
-		resetFn();
+		const result = resetFn();
+		if (result instanceof Promise)
+			await result;
+		
 	}
 }
