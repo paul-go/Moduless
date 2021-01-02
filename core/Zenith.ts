@@ -33,7 +33,7 @@ namespace Moduless
 		
 		cli
 			.command("set <location>", "Set a line within a source file to start running (/path/to/file.ts:123)")
-			.action(location =>
+			.action((location: string) =>
 			{
 				let [coverFilePath, lineNumText] = location.split(":");
 				let lineIdx = 0;

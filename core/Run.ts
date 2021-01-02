@@ -213,9 +213,6 @@ namespace Moduless
 		if (typeof coverFunction !== "function")
 			return;
 		
-		if (!coverFnReg.test(coverName))
-			return;
-		
 		const coverFunctionName = coverName.replace(coverFnPrefixReg, "");
 		let coverResult = coverFunction();
 		
