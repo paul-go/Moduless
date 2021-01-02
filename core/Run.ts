@@ -349,6 +349,5 @@ namespace Moduless
 		const result = resetFn();
 		if (result instanceof Promise)
 			await result;
-		
 	}
 }
