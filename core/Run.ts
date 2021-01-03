@@ -199,14 +199,16 @@ namespace Moduless
 			return false;
 		
 		for (const [coverName, coverFunction] of coverEntries)
-			await runSingleCover(coverNamespace, coverName, coverFunction);
+		{
+			await maybeRunEnvironmentReset(coverNamespace);
+			await runSingleCover(coverName, coverFunction);
+		}
 		
 		return true;
 	}
 	
 	/** */
 	export async function runSingleCover(
-		coverNamespace: Namespace,
 		coverName: string,
 		coverFunction: CoverFn)
 	{
@@ -260,8 +262,6 @@ namespace Moduless
 		else if (isAsyncGenerator(coverResult))
 			for await (const checkerFn of coverResult)
 				await execCheckerAsync(coverFunctionName, checkerFn);
-		
-		await maybeRunEnvironmentReset(coverNamespace);
 	}
 	
 	/** */
