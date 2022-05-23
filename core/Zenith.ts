@@ -4,7 +4,7 @@ namespace Moduless
 	/** */
 	function runFromCommandLine()
 	{
-		const cli =  require("cac")() as 
+		const cli = require("cac")() as 
 			ReturnType<typeof import("../node_modules/cac/types/index").cac>;
 		
 		cli
@@ -159,6 +159,7 @@ namespace Moduless
 			webPreferences: {
 				enableRemoteModule: true,
 				nodeIntegration: true,
+				contextIsolation: false,
 				webSecurity: false,
 				devTools: true
 			}

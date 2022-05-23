@@ -3,22 +3,19 @@
 namespace Moduless
 {
 	export const inElectronMain = 
-		typeof process === "object" && 
-		"electronBinding" in process &&
-		typeof window === "undefined" &&
-		typeof postMessage === "undefined";
+		typeof process !== "undefined" &&
+		(window.process as any).type !== "renderer";
 	
 	export const inElectronRender = 
-		typeof process === "object" && 
-		"electronBinding" in process &&
-		typeof window !== "undefined" &&
-		typeof postMessage === "function";
+		typeof window !== "undefined" && 
+		typeof window.process === "object" &&
+		(window.process as any).type === "renderer";
 	
 	export const inNode = 
 		!inElectronMain && 
 		!inElectronRender &&
 		typeof process === "object" && 
-		"binding" in process;
+		process.release.name === "node";
 	
 	/**
 	 * Gets whether the host environment is a browser, whether that is
