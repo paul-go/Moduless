@@ -292,8 +292,9 @@ namespace Moduless
 			const passed = checkerFn();
 			report(passed, coverFunctionName, checkerText);
 		}
-		catch (e)
+		catch (err)
 		{
+			const e = err as Error;
 			Util.error(
 				"Checker function: " + checkerText + " generated an error: \n" +
 				"\t" + e.name + ": " + e.message + "\r\n" +
@@ -302,7 +303,7 @@ namespace Moduless
 	}
 	
 	/** */
-	async function execCheckerAsync(coverFunctionName: string, checkerFn: () => boolean)
+	async function execCheckerAsync(coverFunctionName: string, checkerFn: () => Promise<boolean>)
 	{
 		const checkerText = checkerFn.toString().replace(/^\s*\(\)\s*=>\s*/, "");
 		
@@ -311,8 +312,9 @@ namespace Moduless
 			const passed = await checkerFn();
 			report(passed, coverFunctionName, checkerText);
 		}
-		catch (e)
+		catch (err)
 		{
+			const e = err as Error;
 			Util.error(
 				"Checker function: " + checkerText + " generated an error: \n" +
 				"\t" + e.name + ": " + e.message + "\r\n" +

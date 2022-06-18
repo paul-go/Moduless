@@ -4,8 +4,7 @@ namespace Moduless
 	/** */
 	function runFromCommandLine()
 	{
-		const cli = require("cac")() as 
-			ReturnType<typeof import("../node_modules/cac/types/index").cac>;
+		const cli = require("cac")();
 		
 		cli
 			.command("", "Run the cover function that was set previously.")
