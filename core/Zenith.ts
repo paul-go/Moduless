@@ -137,7 +137,7 @@ namespace Moduless
 		{
 			(function isReady()
 			{
-				if (Electron.app.isReady())
+				if (Electron.app && Electron.app.isReady())
 					r();
 				else
 					setTimeout(isReady, 5);
