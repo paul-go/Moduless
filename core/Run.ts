@@ -207,6 +207,15 @@ namespace Moduless
 		return true;
 	}
 	
+	/**
+	 * Returns the name of the cover function currently being tested.
+	 */
+	export function getRunningFunctionName()
+	{
+		return runningFunctionName;
+	}
+	let runningFunctionName = "";
+	
 	/** */
 	export async function runSingleCover(
 		coverName: string,
@@ -216,7 +225,9 @@ namespace Moduless
 			return;
 		
 		const coverFunctionName = coverName.replace(coverFnPrefixReg, "");
+		runningFunctionName = coverFunctionName;
 		let coverResult = coverFunction();
+		runningFunctionName = "";
 		
 		if (coverResult === undefined || coverResult === null)
 		{
