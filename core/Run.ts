@@ -227,7 +227,6 @@ namespace Moduless
 		const coverFunctionName = coverName.replace(coverFnPrefixReg, "");
 		runningFunctionName = coverFunctionName;
 		let coverResult = coverFunction();
-		runningFunctionName = "";
 		
 		if (coverResult === undefined || coverResult === null)
 		{
