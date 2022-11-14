@@ -14,19 +14,52 @@ namespace Moduless
 	type CoverFn = () => CoverReturn | Promise<CoverReturn>;
 	
 	/** */
-	type Namespace = Record<string, CoverFn>;
-	
-	const coverNamespaceReg = /^Cover[A-Z]?/;
-	const coverFnReg = /^cover[A-Z0-9]/;
-	const coverFnPrefixReg = /^cover/;
-	const global: any = globalThis;
+	export interface IRunInfo
+	{
+		cwd: string;
+		namespacePath: string[];
+		functionPrefix?: string;
+		functionName?: string;
+	}
 	
 	/**
 	 * 
 	 */
-	export async function run(
-		cwd = process.cwd(),
-		coverFunctionName: RegExp | string = "")
+	export namespace IRunInfo
+	{
+		/**
+		 * Creates an IRunInfo namespace, parsed from
+		 * the specified namespace path, and function prefix.
+		 */
+		export function parsePrefix(qualifiedName: string): IRunInfo
+		{
+			const parts = qualifiedName.split(".");
+			return {
+				cwd: process.cwd(),
+				namespacePath: parts.slice(0, -1),
+				functionPrefix: parts.at(-1) || ""
+			};
+		}
+		
+		/**
+		 * Creates an IRunInfo namespace, parsed from
+		 * the specified namespace path, and function name.
+		 */
+		export function parseNamed(qualified: string)
+		{
+			const parts = qualified.split(".");
+			return {
+				cwd: process.cwd(),
+				namespacePath: parts.slice(0, -1),
+				functionName: parts.at(-1) || ""
+			};
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	export async function run(info: IRunInfo)
 	{
 		// Wait 1600ms to give the debugger a chance to connect.
 		// This can be a problem with larger projects.
@@ -38,43 +71,22 @@ namespace Moduless
 			console.clear();
 		}
 		
-		if (coverFunctionName === "")
-			Util.log("Running all discoverable cover functions.");
-		
-		// NOTE: This code is messed up, but it works, for now. The following
-		// function call isn't actually just loading covers from the dependencies,
-		// it's also including the dependencies as well, which needs to be done
-		// in order for things to load.
-		let coverNamespaces = tryLoadCoversFromDependencies(cwd);
-		
-		// In the case when there is already a cover function namespace
-		// found in the global scope, we skip the loading of the project
-		// reference scripts, because we assume that the references
-		// have already been loaded by another means.
-		if (!coverNamespaces)
-			coverNamespaces = tryLoadCoversFromGlobal();
-		
-		if (!coverNamespaces)
+		if (!info.functionName)
 		{
-			Util.error(
-				`No namespaces where found that begin with the prefix "Cover".\n` +
-				`Be sure you're exporting the namespace like: module.exports = { MyNamespace }; `);
-			
-			return;
+			Util.log(
+				`Running cover functions in ${info.namespacePath.join(".")} ` +
+				`starting with ${info.functionPrefix}.`);
 		}
 		
 		let hasRunOneFunction = false;
 		
-		for (const ns of coverNamespaces)
+		const coverResult = await runCovers(info);
+		if (coverResult)
 		{
-			const coverResult = await runCovers(ns, coverFunctionName);
-			if (coverResult)
-			{
-				hasRunOneFunction = true;
-				
-				if (coverFunctionName)
-					break;
-			}
+			hasRunOneFunction = true;
+			
+			if (info.functionName)
+				return;
 		}
 		
 		if (!hasRunOneFunction)
@@ -88,13 +100,15 @@ namespace Moduless
 	 */
 	function tryLoadCoversFromDependencies(cwd = process.cwd())
 	{
-		const coverNamespaces: Namespace[] = [];
+		//const coverNamespaces: Namespace[] = [];
 		const graph = new ProjectGraph(cwd);
 		const scriptFilePaths: string[] = [];
 		
 		for (const project of graph.eachProject())
 			if (project.outFile !== "")
 				scriptFilePaths.push(project.outFile);
+		
+		const exports: object[] = [];
 		
 		for (const scriptFilePath of scriptFilePaths)
 		{
@@ -106,26 +120,10 @@ namespace Moduless
 			
 			try
 			{
-				const requireResult = require(scriptFilePath);
-				if (!requireResult || 
-					typeof requireResult !== "object" ||
-					Object.keys(requireResult).length === 0)
-				{
-					console.warn("Project at " + scriptFilePath + " has no export.");
-					continue;
-				}
+				const exp = require(scriptFilePath);
 				
-				for (const [key, value] of Object.entries(requireResult))
-				{
-					if (value === undefined || value === null || value !== value)
-						continue;
-					
-					const val = value as Namespace;
-					global[key] = value;
-					
-					if (coverFnReg.test(key))
-						coverNamespaces.push(val);
-				}
+				if (exp && typeof exp === "object" && !Array.isArray(exp))
+					exports.push(exp);
 			}
 			catch (e)
 			{
@@ -133,76 +131,71 @@ namespace Moduless
 			}
 		}
 		
-		if (coverNamespaces.length === 0)
-			return null;
-		
-		return coverNamespaces;
-	}
-	
-	/**
-	 * Finds cover functions defined in the global scope.
-	 * Returns null in the case when no functions were discovered.
-	 */
-	function tryLoadCoversFromGlobal()
-	{
-		const coverNamespaces: Namespace[] = [];
-		
-		for (const key of Object.keys(global))
-		{
-			// Avoid accessing members that whose names aren't
-			// compliant with the expected format.
-			if (!coverNamespaceReg.test(key))
-				continue;
-			
-			const value = global[key];
-			if (value === undefined || value === null || value !== value)
-				continue;
-			
-			if (coverNamespaceReg.test(key) && typeof value === "object")
-				coverNamespaces.push(value as Namespace);
-		}
-		
-		if (coverNamespaces.length === 0)
-			return null;
-		
-		return coverNamespaces;
+		return exports;
 	}
 	
 	/**
 	 * Runs the cover functions with the specified name, from the specified
 	 * namespace. Intended for use with Node.js.
 	 */
-	async function runCovers(
-		coverNamespace: Namespace,
-		coverFunctionName: RegExp | string = "")
+	async function runCovers(info: IRunInfo)
 	{
-		const coverEntries = (() =>
+		const exports = [
+			...tryLoadCoversFromDependencies(info.cwd),
+			globalThis,
+		];
+		
+		const resolvedNamespace = (() =>
 		{
-			if (typeof coverFunctionName === "string")
+			nextExport: for (const exp of exports)
 			{
-				if (coverFunctionName === "")
-					return Object.entries(coverNamespace);
+				let current: any = exp;
 				
-				const coverFunction = coverNamespace[coverFunctionName];
-				return typeof coverFunction === "function" ?
-					[[coverFunctionName, coverFunction]] as [string, CoverFn][] :
-					[];
+				for (const identifier of info.namespacePath)
+				{
+					if (!(identifier in current))
+						continue nextExport;
+					
+					current = current[identifier];
+				}
+				
+				if (!current || typeof current !== "object")
+					continue nextExport;
+				
+				return current as Record<string, any>;
 			}
 			
-			return Object.entries(coverNamespace).filter(entry =>
-			{
-				return coverFunctionName.test(entry[0]);
-			});
+			throw new Error(
+				"Could not resolve: " + info.namespacePath + 
+				". Not found or not an object.");
 		})();
 		
-		if (coverEntries.length === 0)
+		const covers = (() =>
+		{
+			const out: [string, CoverFn][] = [];
+			
+			if (info.functionName)
+			{
+				const fn = resolvedNamespace[info.functionName];
+				if (typeof fn !== "function")
+					throw new Error(info.functionName + " is not a function.");
+				
+				out.push([info.functionName, fn]);
+			}
+			else if (info.functionPrefix)
+				for (const [functionName, maybeFunction] of Object.entries(resolvedNamespace))
+					if (typeof maybeFunction === "function")
+						if (functionName.startsWith(info.functionPrefix))
+							out.push([functionName, maybeFunction]);
+			
+			return out;
+		})();
+		
+		if (covers.length === 0)
 			return false;
 		
-		for (const [coverName, coverFunction] of coverEntries)
-		{
-			await maybeRunEnvironmentReset(coverNamespace);
+		for (const [coverName, coverFunction] of covers)
 			await runSingleCover(coverName, coverFunction);
-		}
 		
 		return true;
 	}
@@ -224,13 +217,12 @@ namespace Moduless
 		if (typeof coverFunction !== "function")
 			return;
 		
-		const coverFunctionName = coverName.replace(coverFnPrefixReg, "");
-		runningFunctionName = coverFunctionName;
+		runningFunctionName = coverName;
 		let coverResult = coverFunction();
 		
 		if (coverResult === undefined || coverResult === null)
 		{
-			report(true, coverFunctionName);
+			report(true, coverName);
 			return;
 		}
 		
@@ -257,21 +249,21 @@ namespace Moduless
 		}
 		
 		if (coverResult === true)
-			report(true, coverFunctionName);
+			report(true, coverName);
 		
 		else if (coverResult === false)
-			report(false, coverFunctionName);
+			report(false, coverName);
 		
 		else if (typeof coverResult === "function")
-			execChecker(coverFunctionName, coverResult);
+			execChecker(coverName, coverResult);
 		
 		else if (Array.isArray(coverResult) || isGenerator(coverResult))
 			for (const checkerFn of coverResult)
-				execChecker(coverFunctionName, checkerFn);
+				execChecker(coverName, checkerFn);
 		
 		else if (isAsyncGenerator(coverResult))
 			for await (const checkerFn of coverResult)
-				await execCheckerAsync(coverFunctionName, checkerFn);
+				await execCheckerAsync(coverName, checkerFn);
 	}
 	
 	/** */
@@ -345,21 +337,5 @@ namespace Moduless
 		passed ?
 			Util.log(message) :
 			Util.error(message);
-	}
-	
-	/**
-	 * Attempts to find the environment reset function defined in the global scope,
-	 * and runs this function if it exists. The environment reset function needs to
-	 * be named "modulessReset"
-	 */
-	async function maybeRunEnvironmentReset(ns: Namespace)
-	{
-		const resetFn = ns["modulessReset"] as Function;
-		if (typeof resetFn !== "function")
-			return;
-		
-		const result = resetFn();
-		if (result instanceof Promise)
-			await result;
 	}
 }

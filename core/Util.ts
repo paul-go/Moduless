@@ -104,16 +104,49 @@ namespace Moduless
 		}
 		
 		/**
-		 * Converts a cover name which is expected to be in the format
-		 * "coverSomeSpecificBehavior" to read like "Some specific behavior".
+		 * 
 		 */
-		export function getCoverFriendlyName(coverName: string)
+		export function getContainingNamespaceName(lines: string[])
 		{
-			return coverName
-				.slice(Constants.prefix.length)
-				.split(/(?=[A-Z])/)
-				.map((v, i) => i > 0 ? v.toLowerCase() : v)
-				.join(" ");
+			if (lines.length === 0)
+				return "";
+			
+			const namespace: string[] = [];
+			const getIndent = (line: string) => line.length - line.trimStart().length;
+			let currentIndent = getIndent(lines[lines.length - 1]);
+			
+			if (currentIndent === 0)
+				return "";
+			
+			for (let i = lines.length; i-- > 0;)
+			{
+				const line = lines[i];
+				const lineIndent = getIndent(line);
+				if (lineIndent < currentIndent)
+				{
+					const reg = /\s*namespace\s+[a-z0-9$\.]+\s*{?/gi;
+					if (reg.test(line))
+					{
+						const ns = line
+							.trim()
+							.replace(/^namespace\s+/, "")
+							.split(/[\/\s{]/)[0];
+						
+						
+						namespace.unshift(...ns.split("."));
+						currentIndent = lineIndent;
+					}
+					
+					if (currentIndent === 0)
+						break;
+				}
+			}
+			
+			return namespace
+				.map(s => s.trim())
+				.filter(s => !!s)
+				.map(s => s + ".")
+				.join("");
 		}
 		
 		/**

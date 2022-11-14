@@ -1,16 +1,14 @@
 
+namespace Name.Space
+{
+	export function runThisFunction()
+	{
+		return () => "Success";
+	}
+}
+
 namespace Cover
 {
-	/** */
-	export function coverCreateProgram()
-	{
-		const program = Example.createProgram();
-		return [
-			() => 1 + 1 === 2,
-			() => program instanceof Truth.Program
-		]
-	}
-	
 	/** */
 	export function coverAddition()
 	{

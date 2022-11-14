@@ -32,13 +32,4 @@ namespace Moduless
 	export const Electron = (inElectronMain || inElectronRender) ?
 		require("electron") :
 		{};
-	
-	export const enum Constants
-	{
-		/**
-		 * The prefix that all cover functions must have in their name
-		 * in order to be discovered by the moduless cover system.
-		 */
-		prefix = "cover"
-	}
 }

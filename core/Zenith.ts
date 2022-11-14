@@ -7,19 +7,20 @@ namespace Moduless
 		const cli = require("cac")();
 		
 		cli
-			.command("", "Run the cover function that was set previously.")
+			.command("", "Run the cover function that has been marked as active.")
 			.action(async () =>
 			{
-				await runAssigned();
+				await runActive();
 			});
 		
 		cli
-			.command("all <regular_expression>", 
+			.command("all <prefix>", 
 				"Run many cover functions in series, optionally filtering by those " +
-				"whose function names conform to a regular expression.")
-			.action(async (regular_expression: string) =>
+				"whose function names start with the specified prefix, which may " + 
+				"contain a namespace, for example Name.Space.fnPrefix")
+			.action(async (prefix: string) =>
 			{
-				await runAll(regular_expression || "");
+				await runAll(prefix || "");
 			});
 		
 		cli
@@ -47,6 +48,9 @@ namespace Moduless
 				const codeFileLines = codeFileText.split("\n");
 				const specifiedLine = codeFileLines[lineIdx - 1];
 				const functionName = Util.getFunctionNameFromLine(specifiedLine);
+				const namespaceLines = codeFileLines.slice(0, lineIdx);
+				const namespaceName = Util.getContainingNamespaceName(namespaceLines);
+				const qualifiedName = namespaceName + functionName;
 				
 				if (functionName === "")
 				{
@@ -54,8 +58,8 @@ namespace Moduless
 					return;
 				}
 				
-				Settings.writeSetFunctionName(coverFilePath, functionName);
-				console.log(`Moduless will now run ${functionName}() in ${coverFilePath} by default.`);
+				Settings.writeActiveFunctionName(coverFilePath, qualifiedName);
+				console.log(`Moduless will now run ${qualifiedName}() in ${coverFilePath} by default.`);
 			});
 		
 		cli.help();
@@ -63,34 +67,36 @@ namespace Moduless
 	}
 	
 	/** */
-	async function runAssigned()
+	async function runActive()
 	{
 		const cwd = process.cwd();
-		const coverFunctionName = Settings.readSetFunction(cwd);
-		await run(coverFunctionName);
+		const qualifiedName = Settings.readActiveFunctionName(cwd);
+		const info = IRunInfo.parseNamed(qualifiedName);
+		await Moduless.run(info);
+		Util.separate();
 	}
 	
 	/** */
-	async function runAll(regexStr: string)
+	async function runAll(prefix: string)
 	{
-		if (regexStr)
-		{
-			console.log("Running cover functions conforming to: " + regexStr);
-			const regExp = new RegExp(regexStr);
-			await run(regExp);
-		}
-		else
-		{
-			console.log("Running all discoverable cover functions");
-			await run();
-		}
+		console.log("Running functions that start with: " + prefix);
+		
+		const parts = prefix.split(".");
+		const info: IRunInfo = {
+			cwd: process.cwd(),
+			namespacePath: parts.slice(0, -1),
+			functionPrefix: parts.at(-1) || ""
+		};
+		
+		await Moduless.run(info);
+		Util.separate();
 	}
 	
 	/** */
-	async function run(coverFunctionName: RegExp | string = "")
+	async function run(qualifiedName: string)
 	{
-		const projectPath = process.cwd();
-		await Moduless.run(projectPath, coverFunctionName);
+		const info = IRunInfo.parseNamed(qualifiedName);
+		await Moduless.run(info);
 		Util.separate();
 	}
 	
@@ -99,8 +105,8 @@ namespace Moduless
 	{
 		/** Run all cover functions. */
 		all,
-		/** Run the assigned cover function. */
-		assigned,
+		/** Run the active cover function. */
+		active,
 		/** Run all cover functions whose name conform to a regular expression. */
 		some
 	}
@@ -119,10 +125,13 @@ namespace Moduless
 			const parsed = parseQueryString();
 			
 			if (parsed === RunGroup.all)
-				run();
+			{
+				throw "Not implemented";
+				run("");
+			}
 				
-			else if (parsed === RunGroup.assigned)
-				runAssigned();
+			else if (parsed === RunGroup.active)
+				runActive();
 			
 			else
 				runAll(parsed);
@@ -145,6 +154,8 @@ namespace Moduless
 		
 		const [x, y] = PersistentVars.lastWindowPosition;
 		const [width, height] = PersistentVars.lastWindowSize;
+		
+		Electron.contextBridge.exposeInMainWorld("electron", { require });
 		
 		const window = new Electron.BrowserWindow({
 			title: "Moduless",
@@ -206,7 +217,7 @@ namespace Moduless
 			return "?" + key + value;
 		}
 		
-		// Defaults to running the assigned cover function.
+		// Defaults to running the target cover function.
 		return "";
 	}
 	
@@ -227,6 +238,6 @@ namespace Moduless
 			return regularExpressionText;
 		}
 		
-		return RunGroup.assigned;
+		return RunGroup.active;
 	}
 }

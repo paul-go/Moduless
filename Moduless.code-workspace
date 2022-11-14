@@ -19,7 +19,8 @@
 			"**/bundle": true,
 			"**/node_modules": true,
 			"**/package-lock.json": true
-		}
+		},
+		"task.allowAutomaticTasks": "on"
 	},
 	"launch": {
 		"configurations": [
@@ -38,14 +39,14 @@
 				"request": "launch",
 				"program": "${workspaceRoot}/build/moduless.js",
 				"args": [
-					"set", "./coverage/CoverExample.ts:28"
+					"set", "./coverage/CoverExample.ts:4"
 				],
 				"cwd": "${workspaceFolder}/example",
 				"smartStep": true,
 				"sourceMaps": true
 			},
 			{
-				"name": "Debug 'run assigned' in NodeJS",
+				"name": "Debug 'run active' in NodeJS",
 				"type": "node",
 				"request": "launch",
 				"program": "${workspaceRoot}/build/moduless.js",
@@ -54,7 +55,7 @@
 				"sourceMaps": true
 			},
 			{
-				"name": "Debug 'run assigned' in Electron",
+				"name": "Debug 'run active' in Electron",
 				"type": "node",
 				"request": "launch",
 				"cwd": "${workspaceFolder}/example",
@@ -69,7 +70,8 @@
 				"request": "launch",
 				"program": "${workspaceRoot}/build/moduless.js",
 				"args": [
-					"all"
+					"all",
+					"Cover.cover"
 				],
 				"cwd": "${workspaceFolder}/example",
 				"smartStep": true,

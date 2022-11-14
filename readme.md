@@ -1,8 +1,34 @@
 
 # Moduless
 
-(New README coming)
+A lightweight function runner that supports module-free workflow. Designed for use with Visual Studio Code.
 
-## Environment Reset
+## How to use
 
-Cover namespaces may export a function called `modulessReset`. If this function exists, it will be called at the end of the execution of every cover function in the cover namespace (whether the function passes or fails) in order to reset the environment for the next cover function. This function is only called when running multiple cover functions in a series.
+Step 1: Install moduless into your project:
+```
+npm install moduless --save-dev
+```
+
+Step 2: Create a Visual Studio Code task that will allow you to easily set an active function to run. In your `.code-workspace` file, merge in the following JSON:
+
+```json
+{
+	"tasks": {
+		"tasks": [
+			{
+				"label": "Set Active Cover Function",
+				"type": "shell",
+				"command": "npx",
+				"args": [
+					"moduless",
+					"set",
+					"${file}:${lineNumber}"
+				],
+				"problemMatcher": []
+			},
+		]
+	}
+}
+```
+It's highly recommended that you assign a Hotkey to this task. When using the moduless workflow, you'll be running this task _constantly_.

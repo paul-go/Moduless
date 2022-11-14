@@ -11,7 +11,7 @@ namespace Moduless
 		/**
 		 * Reads the name of the function to run.
 		 */
-		export function readSetFunction(projectCwd: string)
+		export function readActiveFunctionName(projectCwd: string)
 		{
 			const config = readConfigFile();
 			
@@ -19,19 +19,16 @@ namespace Moduless
 				projectCwd += Path.sep;
 			
 			const initialConfigLength = config.length;
-			let foundCoverFunctionName = "";
+			let foundFunctionName = "";
 			
 			for (let i = config.length; i-- > 0;)
 			{
-				// Split the cover function file path into its parts,
-				// so that we can successive pop the last directory name off the end,
-				// to eventually find the one that matches the working directory.
-				const [coverFnFilePath, coverFnName] = config[i];
+				const [fnFilePath, fnName] = config[i];
 				
-				if (coverFnFilePath.startsWith(projectCwd))
+				if (fnFilePath.startsWith(projectCwd))
 				{
-					if (foundCoverFunctionName === "")
-						foundCoverFunctionName = coverFnName;
+					if (foundFunctionName === "")
+						foundFunctionName = fnName;
 					
 					// Continue iterating, erasing previous entries in the config
 					// array where the path starts with the cwd. We need to do
@@ -46,18 +43,18 @@ namespace Moduless
 			if (config.length !== initialConfigLength)
 				writeConfigFile(config);
 			
-			return foundCoverFunctionName;
+			return foundFunctionName;
 		}
 		
 		/**
 		 * Stores the name of the function to run.
 		 */
-		export function writeSetFunctionName(
+		export function writeActiveFunctionName(
 			functionFilePath: string,
-			functionName: string)
+			qualifiedFunctionName: string)
 		{
 			const config = readConfigFile();
-			config.push([functionFilePath, functionName]);
+			config.push([functionFilePath, qualifiedFunctionName]);
 			writeConfigFile(config);
 		}
 		
