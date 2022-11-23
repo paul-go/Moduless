@@ -15,8 +15,7 @@
 	"main": "build/moduless.js",
 	"bin": "build/moduless.js",
 	"files": [
-		"build/moduless.js",
-		"build/moduless-electron.js"
+		"build/moduless.js"
 	],
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 0",
