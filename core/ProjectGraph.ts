@@ -56,32 +56,6 @@ namespace Moduless
 			}
 			
 			const targetProjectDir = Path.dirname(targetConfigFilePath);
-			
-			/*
-			for (const script of tsConfig.moduless.scripts)
-			{
-				if (typeof script === "string")
-				{
-					const scriptUrl = Url.parse(script);
-					if (scriptUrl.protocol === "http:" || scriptUrl.protocol === "https:")
-					{
-						scripts.push(new ScriptReference(ScriptKind.external, script));
-						continue;
-					}
-					else if (scriptUrl.protocol === null)
-					{
-						scripts.push(new ScriptReference(
-							ScriptKind.local,
-							Path.join(targetProjectDir, script)));
-						
-						continue;
-					}
-				}
-				
-				Util.error("Invalid script URL: " + String(script));
-			}
-			*/
-			
 			let outFile = "";
 			
 			if (tsConfig.compilerOptions.outFile)
