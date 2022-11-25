@@ -69,35 +69,30 @@ namespace Moduless
 	}
 	
 	/**
-	 * Finds cover functions tucked away in TypeScript files that can
-	 * only be found by traversing the TypeScript project structure.
-	 * Returns null in the case when no functions were discovered.
+	 * Scans the entire project graph, calls require() on each
+	 * outFile defined in each project, and returns an array of
+	 * objects containing the the Project objects and the export
+	 * value acquired from the require() call.
 	 */
-	function tryLoadCoversFromDependencies(projectPath: string)
+	function getGraphFromDependencies(projectPath: string)
 	{
 		const graph = new ProjectGraph(projectPath);
-		const scriptFilePaths: string[] = [];
+		const out: { project: Project; export: object; }[] = [];
 		
 		for (const project of graph.eachProject())
-			if (project.outFile !== "")
-				scriptFilePaths.push(project.outFile);
-		
-		const exports: object[] = [];
-		
-		for (const scriptFilePath of scriptFilePaths)
 		{
-			if (!Fs.existsSync(scriptFilePath))
+			if (!Fs.existsSync(project.outFile))
 			{
-				Util.error("File not found: " + scriptFilePath);
+				Util.error("File not found: " + project.outFile);
 				continue;
 			}
 			
 			try
 			{
-				const exp = require(scriptFilePath);
+				const exp = require(project.outFile);
 				
 				if (exp && typeof exp === "object" && !Array.isArray(exp))
-					exports.push(exp);
+					out.push({ project, export: exp });
 			}
 			catch (e)
 			{
@@ -105,7 +100,7 @@ namespace Moduless
 			}
 		}
 		
-		return exports;
+		return out;
 	}
 	
 	/**
@@ -114,33 +109,31 @@ namespace Moduless
 	 */
 	async function runCovers(target: IRunMeta)
 	{
-		const dependencies = tryLoadCoversFromDependencies(target.projectPath);
-		const exports = [...dependencies, globalThis];
+		const ns = target.functionNamespace.join(".");
+		const graph = getGraphFromDependencies(target.projectPath);
+		const startingProject = graph.at(-1);
 		
-		const resolvedNamespace = (() =>
+		if (!startingProject)
+			throw new Error("No projects found at location: " + target.projectPath);
+		
+		const tryResolveNamepace = (root: object) =>
 		{
-			nextExport: for (const exp of exports)
+			let current: any = root;
+			
+			for (const identifier of target.functionNamespace)
 			{
-				let current: any = exp;
+				if (!(identifier in current))
+					return null;
 				
-				for (const identifier of target.functionNamespace)
-				{
-					if (!(identifier in current))
-						continue nextExport;
-					
-					current = current[identifier];
-				}
-				
-				if (!current || typeof current !== "object")
-					continue nextExport;
-				
-				return current as Record<string, any>;
+				current = current[identifier];
 			}
 			
-			const ns = target.functionNamespace.join(".");
-			throw new Error(
-				`Could not resolve: ${ns}\nNot found or not an object.`);
-		})();
+			return current;
+		};
+		
+		const namespaceObject =
+			tryResolveNamepace(startingProject.export) ||
+			globalThis;
 		
 		const covers = (() =>
 		{
@@ -148,17 +141,18 @@ namespace Moduless
 			
 			if (target.functionName)
 			{
-				const fn = resolvedNamespace[target.functionName];
+				const fn = namespaceObject[target.functionName];
+				
 				if (typeof fn !== "function")
-					throw new Error(target.functionName + " is not a function.");
+					throw new Error(`${ns}.${target.functionName} is not a function.`);
 				
 				out.push([target.functionName, fn]);
 			}
 			else if (target.prefix)
-				for (const [functionName, maybeFunction] of Object.entries(resolvedNamespace))
+				for (const [functionName, maybeFunction] of Object.entries(namespaceObject))
 					if (typeof maybeFunction === "function")
 						if (functionName.startsWith(target.functionName))
-							out.push([functionName, maybeFunction]);
+							out.push([functionName, maybeFunction as any]);
 			
 			return out;
 		})();
