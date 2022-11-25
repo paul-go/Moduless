@@ -77,7 +77,7 @@ namespace Moduless
 	function getGraphFromDependencies(projectPath: string)
 	{
 		const graph = new ProjectGraph(projectPath);
-		const out: { project: Project; export: object; }[] = [];
+		const out: { project: Project; exported: object; }[] = [];
 		
 		for (const project of graph.eachProject())
 		{
@@ -89,10 +89,9 @@ namespace Moduless
 			
 			try
 			{
-				const exp = require(project.outFile);
-				
-				if (exp && typeof exp === "object" && !Array.isArray(exp))
-					out.push({ project, export: exp });
+				const ex = require(project.outFile);
+				if (ex && typeof ex === "object" && !Array.isArray(ex))
+					out.push({ project, exported: ex });
 			}
 			catch (e)
 			{
@@ -116,6 +115,24 @@ namespace Moduless
 		if (!startingProject)
 			throw new Error("No projects found at location: " + target.projectPath);
 		
+		// Globalize the exports of all projects.
+		for (const { project, exported } of graph)
+		{
+			for (const [name, value] of Object.entries(exported))
+			{
+				if (name in globalThis)
+				{
+					console.warn(
+						`Skipping adding ${name} from ${project.projectPath} to global scope ` +
+						`because another member with this name is already defined globally.`);
+					
+					continue;
+				}
+				
+				(globalThis as any)[name] = value;
+			}
+		}
+	
 		const tryResolveNamepace = (root: object) =>
 		{
 			let current: any = root;
@@ -132,7 +149,7 @@ namespace Moduless
 		};
 		
 		const namespaceObject =
-			tryResolveNamepace(startingProject.export) ||
+			tryResolveNamepace(startingProject.exported) ||
 			globalThis;
 		
 		const covers = (() =>
