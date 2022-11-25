@@ -32,25 +32,27 @@ namespace Moduless
 			});
 		
 		cli
-			.command("set <location>", "Set a line within a source file to start running (/path/to/file.ts:123)")
+			.command(
+				"set <location>", 
+				"Set a line within a source file to start running (/path/to/file.ts:123)")
 			.action((location: string) =>
 			{
-				let [coverFilePath, lineNumText] = location.split(":");
+				let [functionFilePath, lineNumText] = location.split(":");
 				let lineIdx = 0;
 				if (!lineNumText || !(lineIdx = parseInt(lineNumText, 10)) || lineIdx < 1)
 					return Util.error("Input is expected to be in the form: /path/to/file.ts:123");
 				
-				coverFilePath = Path.resolve(coverFilePath);
-				if (!Fs.existsSync(coverFilePath))
-					return Util.error("Code file does not exist: " + coverFilePath);
+				functionFilePath = Path.resolve(functionFilePath);
+				if (!Fs.existsSync(functionFilePath))
+					return Util.error("Code file does not exist: " + functionFilePath);
 				
-				const codeFileText = Fs.readFileSync(coverFilePath).toString("utf8");
+				const codeFileText = Fs.readFileSync(functionFilePath).toString("utf8");
 				const codeFileLines = codeFileText.split("\n");
 				const specifiedLine = codeFileLines[lineIdx - 1];
 				const functionName = Util.getFunctionNameFromLine(specifiedLine);
 				const namespaceLines = codeFileLines.slice(0, lineIdx);
-				const namespaceName = Util.getContainingNamespaceName(namespaceLines);
-				const qualifiedName = namespaceName + functionName;
+				const namespace = Util.getContainingNamespaceName(namespaceLines);
+				const qualifiedName = functionName;
 				
 				if (functionName === "")
 				{
@@ -58,8 +60,12 @@ namespace Moduless
 					return;
 				}
 				
-				Settings.writeActiveFunctionName(coverFilePath, qualifiedName);
-				console.log(`Moduless will now run ${qualifiedName}() in ${coverFilePath} by default.`);
+				Settings.writeActiveFunction(
+					functionFilePath,
+					namespace,
+					qualifiedName);
+				
+				console.log(`Moduless will now run ${qualifiedName}() in ${functionFilePath} by default.`);
 			});
 		
 		cli.help();
@@ -70,33 +76,33 @@ namespace Moduless
 	async function runActive()
 	{
 		const cwd = process.cwd();
-		const qualifiedName = Settings.readActiveFunctionName(cwd);
-		const info = IRunInfo.parseNamed(qualifiedName);
-		await Moduless.run(info);
+		const active = Settings.readActiveFunction(cwd);
+		if (!active)
+		{
+			console.error("No active cover function has been set.");
+			return;
+		}
+		
+		await Moduless.run(active);
 		Util.separate();
 	}
 	
 	/** */
 	async function runAll(prefix: string)
 	{
+		if (1) throw new Error("Not implemented");
+		
 		console.log("Running functions that start with: " + prefix);
-		
-		const parts = prefix.split(".");
-		const info: IRunInfo = {
-			cwd: process.cwd(),
-			namespacePath: parts.slice(0, -1),
-			functionPrefix: parts.at(-1) || ""
-		};
-		
-		await Moduless.run(info);
+		await Moduless.run({} as any);
 		Util.separate();
 	}
 	
 	/** */
 	async function run(qualifiedName: string)
 	{
-		const info = IRunInfo.parseNamed(qualifiedName);
-		await Moduless.run(info);
+		if (1) throw new Error("Not implemented");
+		
+		await Moduless.run({} as any);
 		Util.separate();
 	}
 	

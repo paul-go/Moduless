@@ -7,6 +7,37 @@ namespace Moduless
 	export namespace Util
 	{
 		/**
+		 * 
+		 */
+		export function toDirectory(path: string)
+		{
+			if (!path.endsWith(Path.sep))
+				path += Path.sep;
+			
+			return path;
+		}
+		
+		/**
+		 * Returns the path to the tsconfig.json file that exists in the containing
+		 * folder that is nearest to the specified file.
+		 */
+		export function getContainingConfigFile(nestedFilePath: string)
+		{
+			let current = nestedFilePath;
+			
+			do
+			{
+				current = Path.join(current, "../tsconfig.json");
+				
+				if (Fs.existsSync(current))
+					return current;
+			}
+			while (current !== "/tsconfig.json");
+			
+			return null;
+		}
+		
+		/**
 		 * Parses a TypeScript configuration file (typically called "tsconfig.json"),
 		 * and returns an object containing the relevant information.
 		 */
@@ -109,14 +140,14 @@ namespace Moduless
 		export function getContainingNamespaceName(lines: string[])
 		{
 			if (lines.length === 0)
-				return "";
+				return [];
 			
 			const namespace: string[] = [];
 			const getIndent = (line: string) => line.length - line.trimStart().length;
 			let currentIndent = getIndent(lines[lines.length - 1]);
 			
 			if (currentIndent === 0)
-				return "";
+				return [];
 			
 			for (let i = lines.length; i-- > 0;)
 			{
@@ -142,11 +173,7 @@ namespace Moduless
 				}
 			}
 			
-			return namespace
-				.map(s => s.trim())
-				.filter(s => !!s)
-				.map(s => s + ".")
-				.join("");
+			return namespace;
 		}
 		
 		/**

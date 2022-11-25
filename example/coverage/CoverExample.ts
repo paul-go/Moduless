@@ -49,5 +49,5 @@ namespace Cover
 	}
 	
 	if (typeof module === "object")
-		module.exports = { Cover };
+		module.exports = { Cover, Name };
 }

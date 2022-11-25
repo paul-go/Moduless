@@ -29,7 +29,7 @@
 				"type": "node",
 				"request": "launch",
 				"program": "${workspaceRoot}/build/moduless.js",
-				"cwd": "${workspaceFolder}/example",
+				"cwd": "${workspaceFolder}/example/",
 				"smartStep": true,
 				"sourceMaps": true
 			},
@@ -41,7 +41,7 @@
 				"args": [
 					"set", "./coverage/CoverExample.ts:4"
 				],
-				"cwd": "${workspaceFolder}/example",
+				"cwd": "${workspaceFolder}/example/",
 				"smartStep": true,
 				"sourceMaps": true
 			},
@@ -50,7 +50,7 @@
 				"type": "node",
 				"request": "launch",
 				"program": "${workspaceRoot}/build/moduless.js",
-				"cwd": "${workspaceFolder}/example",
+				"cwd": "${workspaceFolder}/example/",
 				"smartStep": true,
 				"sourceMaps": true
 			},
@@ -58,7 +58,7 @@
 				"name": "Debug 'run active' in Electron",
 				"type": "node",
 				"request": "launch",
-				"cwd": "${workspaceFolder}/example",
+				"cwd": "${workspaceFolder}/example/",
 				"runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron",
 				"program": "${workspaceRoot}/build/moduless.js",
 				"smartStep": true,
@@ -73,7 +73,7 @@
 					"all",
 					"Cover.cover"
 				],
-				"cwd": "${workspaceFolder}/example",
+				"cwd": "${workspaceFolder}/example/",
 				"smartStep": true,
 				"sourceMaps": true
 			},
@@ -81,7 +81,7 @@
 				"name": "Debug 'run all' in Electron",
 				"type": "node",
 				"request": "launch",
-				"cwd": "${workspaceFolder}/example",
+				"cwd": "${workspaceFolder}/example/",
 				"runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron",
 				"program": "${workspaceRoot}/build/moduless.js",
 				"args": [
@@ -94,7 +94,7 @@
 				"name": "Debug 'run from expression' in Electron",
 				"type": "node",
 				"request": "launch",
-				"cwd": "${workspaceFolder}/example",
+				"cwd": "${workspaceFolder}/example/",
 				"runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron",
 				"program": "${workspaceRoot}/build/moduless.js",
 				"args": [

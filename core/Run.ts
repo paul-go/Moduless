@@ -13,57 +13,32 @@ namespace Moduless
 	/** */
 	type CoverFn = () => CoverReturn | Promise<CoverReturn>;
 	
-	/** */
-	export interface IRunInfo
-	{
-		cwd: string;
-		namespacePath: string[];
-		functionPrefix?: string;
-		functionName?: string;
-	}
-	
 	/**
-	 * 
+	 * An interface that stores information about the running
+	 * of a single cover function.
 	 */
-	export namespace IRunInfo
+	export interface IRunMeta
 	{
-		/**
-		 * Creates an IRunInfo namespace, parsed from
-		 * the specified namespace path, and function prefix.
-		 */
-		export function parsePrefix(qualifiedName: string): IRunInfo
-		{
-			const parts = qualifiedName.split(".");
-			return {
-				cwd: process.cwd(),
-				namespacePath: parts.slice(0, -1),
-				functionPrefix: parts.at(-1) || ""
-			};
-		}
+		functionNamespace: string[];
+		functionName: string;
+		projectPath: string;
 		
 		/**
-		 * Creates an IRunInfo namespace, parsed from
-		 * the specified namespace path, and function name.
+		 * Whether the "name" property refers to a prefix (true),
+		 * or whether it's a fully qualified name (false).
 		 */
-		export function parseNamed(qualified: string)
-		{
-			const parts = qualified.split(".");
-			return {
-				cwd: process.cwd(),
-				namespacePath: parts.slice(0, -1),
-				functionName: parts.at(-1) || ""
-			};
-		}
+		prefix?: boolean;
 	}
 	
 	/**
 	 * 
 	 */
-	export async function run(info: IRunInfo)
+	export async function run(runInfo: IRunMeta)
 	{
 		// Wait 1600ms to give the debugger a chance to connect.
-		// This can be a problem with larger projects.
-		await new Promise(r => setTimeout(r, 1600));
+		// This can be a problem with larger projects when 
+		if (Moduless.inElectronMain || Moduless.inElectronRender)
+			await new Promise(r => setTimeout(r, 1600));
 		
 		if (Moduless.inElectronRender)
 		{
@@ -71,21 +46,21 @@ namespace Moduless
 			console.clear();
 		}
 		
-		if (!info.functionName)
+		if (runInfo.prefix)
 		{
 			Util.log(
-				`Running cover functions in ${info.namespacePath.join(".")} ` +
-				`starting with ${info.functionPrefix}.`);
+				`Running cover functions in ${runInfo.functionNamespace.join(".")} ` +
+				`starting with ${runInfo.functionName}.`);
 		}
 		
 		let hasRunOneFunction = false;
 		
-		const coverResult = await runCovers(info);
+		const coverResult = await runCovers(runInfo);
 		if (coverResult)
 		{
 			hasRunOneFunction = true;
 			
-			if (info.functionName)
+			if (runInfo.functionName)
 				return;
 		}
 		
@@ -98,10 +73,9 @@ namespace Moduless
 	 * only be found by traversing the TypeScript project structure.
 	 * Returns null in the case when no functions were discovered.
 	 */
-	function tryLoadCoversFromDependencies(cwd = process.cwd())
+	function tryLoadCoversFromDependencies(projectPath: string)
 	{
-		//const coverNamespaces: Namespace[] = [];
-		const graph = new ProjectGraph(cwd);
+		const graph = new ProjectGraph(projectPath);
 		const scriptFilePaths: string[] = [];
 		
 		for (const project of graph.eachProject())
@@ -138,12 +112,10 @@ namespace Moduless
 	 * Runs the cover functions with the specified name, from the specified
 	 * namespace. Intended for use with Node.js.
 	 */
-	async function runCovers(info: IRunInfo)
+	async function runCovers(target: IRunMeta)
 	{
-		const exports = [
-			...tryLoadCoversFromDependencies(info.cwd),
-			globalThis,
-		];
+		const dependencies = tryLoadCoversFromDependencies(target.projectPath);
+		const exports = [...dependencies, globalThis];
 		
 		const resolvedNamespace = (() =>
 		{
@@ -151,7 +123,7 @@ namespace Moduless
 			{
 				let current: any = exp;
 				
-				for (const identifier of info.namespacePath)
+				for (const identifier of target.functionNamespace)
 				{
 					if (!(identifier in current))
 						continue nextExport;
@@ -165,27 +137,27 @@ namespace Moduless
 				return current as Record<string, any>;
 			}
 			
+			const ns = target.functionNamespace.join(".");
 			throw new Error(
-				"Could not resolve: " + info.namespacePath + 
-				". Not found or not an object.");
+				`Could not resolve: ${ns}\nNot found or not an object.`);
 		})();
 		
 		const covers = (() =>
 		{
 			const out: [string, CoverFn][] = [];
 			
-			if (info.functionName)
+			if (target.functionName)
 			{
-				const fn = resolvedNamespace[info.functionName];
+				const fn = resolvedNamespace[target.functionName];
 				if (typeof fn !== "function")
-					throw new Error(info.functionName + " is not a function.");
+					throw new Error(target.functionName + " is not a function.");
 				
-				out.push([info.functionName, fn]);
+				out.push([target.functionName, fn]);
 			}
-			else if (info.functionPrefix)
+			else if (target.prefix)
 				for (const [functionName, maybeFunction] of Object.entries(resolvedNamespace))
 					if (typeof maybeFunction === "function")
-						if (functionName.startsWith(info.functionPrefix))
+						if (functionName.startsWith(target.functionName))
 							out.push([functionName, maybeFunction]);
 			
 			return out;
