@@ -92,6 +92,21 @@ namespace Moduless
 				const ex = require(project.outFile);
 				if (ex && typeof ex === "object" && !Array.isArray(ex))
 					out.push({ project, exported: ex });
+				
+				// Globalize the exports of the project.
+				for (const [name, value] of Object.entries(ex))
+				{
+					if (name in globalThis)
+					{
+						console.warn(
+							`Skipping adding ${name} from ${project.projectPath} to global scope ` +
+							`because another member with this name is already defined globally.`);
+						
+						continue;
+					}
+					
+					(globalThis as any)[name] = value;
+				}
 			}
 			catch (e)
 			{
@@ -115,24 +130,6 @@ namespace Moduless
 		if (!startingProject)
 			throw new Error("No projects found at location: " + target.projectPath);
 		
-		// Globalize the exports of all projects.
-		for (const { project, exported } of graph)
-		{
-			for (const [name, value] of Object.entries(exported))
-			{
-				if (name in globalThis)
-				{
-					console.warn(
-						`Skipping adding ${name} from ${project.projectPath} to global scope ` +
-						`because another member with this name is already defined globally.`);
-					
-					continue;
-				}
-				
-				(globalThis as any)[name] = value;
-			}
-		}
-	
 		const tryResolveNamepace = (root: object) =>
 		{
 			let current: any = root;
