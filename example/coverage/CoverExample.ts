@@ -1,12 +1,4 @@
 
-namespace Name.Space
-{
-	export function runThisFunction()
-	{
-		return () => "Success";
-	}
-}
-
 namespace Cover
 {
 	/** */
@@ -49,5 +41,5 @@ namespace Cover
 	}
 	
 	if (typeof module === "object")
-		module.exports = { Cover, Name };
+		module.exports = { Cover };
 }

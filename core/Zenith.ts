@@ -24,11 +24,15 @@ namespace Moduless
 			});
 		
 		cli
-			.command("call <function_name>", "Run a specific cover function by name.")
-			.action(async (function_name: string) =>
+			.command("call <qualified_path>", "Run a specific cover function by name, " +
+				"with the path to the project, in the form: /path/to/project:Name.Space.runThis")
+			.action(async (qualified_path: string) =>
 			{
-				console.log("Running cover function: " + function_name);
-				await run(function_name);
+				const parts = qualified_path.split(":");
+				const projectPath = parts[0];
+				const functionName = parts[1];
+				console.log("Running cover function: " + functionName);
+				await run(projectPath, functionName);
 			});
 		
 		cli
@@ -75,8 +79,7 @@ namespace Moduless
 	/** */
 	async function runActive()
 	{
-		const cwd = process.cwd();
-		const active = Settings.readActiveFunction(cwd);
+		const active = Settings.readActiveFunction();
 		if (!active)
 		{
 			console.error("No active cover function has been set.");
@@ -98,11 +101,18 @@ namespace Moduless
 	}
 	
 	/** */
-	async function run(qualifiedName: string)
+	async function run(projectPath: string, functionNameQualified: string)
 	{
-		if (1) throw new Error("Not implemented");
+		const nameParts = functionNameQualified.split(".");
+		const functionNamespace = nameParts.slice(0, -1);
+		const functionName = nameParts.slice(-1)[0];
 		
-		await Moduless.run({} as any);
+		await Moduless.run({
+			functionName,
+			functionNamespace,
+			projectPath,
+		});
+		
 		Util.separate();
 	}
 	
@@ -133,7 +143,6 @@ namespace Moduless
 			if (parsed === RunGroup.all)
 			{
 				throw "Not implemented";
-				run("");
 			}
 				
 			else if (parsed === RunGroup.active)
@@ -161,7 +170,7 @@ namespace Moduless
 		const [x, y] = PersistentVars.lastWindowPosition;
 		const [width, height] = PersistentVars.lastWindowSize;
 		
-		Electron.contextBridge.exposeInMainWorld("electron", { require });
+		//Electron.contextBridge.exposeInMainWorld("electron", { require });
 		
 		const window = new Electron.BrowserWindow({
 			title: "Moduless",
@@ -196,15 +205,28 @@ namespace Moduless
 		window.webContents.session.clearCache();
 		window.webContents.session.clearHostResolverCache();
 		
-		const indexFile = [
-			`<!DOCTYPE html>`,
-			`<script src="${__dirname}/moduless.js"></script>`,
-		].join("\n");
-		
-		const indexPath = __dirname + "/index.html";
-		Fs.writeFileSync(indexPath, indexFile);
-		const url = "file://" + indexPath + composeQueryString();
-		await window.webContents.loadURL(url);
+		let debugUrl = process.env.DEBUG_URL;
+		if (debugUrl)
+		{
+			await window.webContents.loadURL(debugUrl);
+			await window.webContents.executeJavaScript(`{
+				const script = document.createElement("script");
+				script.src = "${__filename}";
+				document.head.append(script);
+			}`);
+		}
+		else
+		{
+			const indexFile = [
+				`<!DOCTYPE html>`,
+				`<script src="${__filename}"></script>`,
+			].join("\n");
+			
+			const indexPath = __dirname + "/index.html";
+			Fs.writeFileSync(indexPath, indexFile);
+			const url = "file://" + indexPath + composeQueryString();
+			await window.webContents.loadURL(url);
+		}
 	}
 	
 	const expressionPrefix = "expression=";

@@ -11,7 +11,7 @@ namespace Moduless
 		/**
 		 * Reads the name of the function to run.
 		 */
-		export function readActiveFunction(cwd: string): IRunMeta | null
+		export function readActiveFunction(cwd = process.cwd()): IRunMeta | null
 		{
 			const targets = readTargetsFile();
 			return targets.get(Util.toDirectory(cwd)) || null;

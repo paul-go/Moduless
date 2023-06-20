@@ -21,18 +21,22 @@ namespace Moduless
 		 * Returns the path to the tsconfig.json file that exists in the containing
 		 * folder that is nearest to the specified file.
 		 */
-		export function getContainingConfigFile(nestedFilePath: string)
+		export function getContainingConfigFile(nestedDirectory: string)
 		{
-			let current = nestedFilePath;
+			let current = nestedDirectory;
 			
-			do
+			for (let i = -1; ++i < 101;)
 			{
-				current = Path.join(current, "../tsconfig.json");
+				const check = Path.join(current, "tsconfig.json");
 				
-				if (Fs.existsSync(current))
-					return current;
+				if (Fs.existsSync(check))
+					return check;
+				
+				current = Path.join(current, "..");
+				
+				if (i >= 100 || current === "/")
+					throw new Error("Could not find containing config file from path: " + nestedDirectory);
 			}
-			while (current !== "/tsconfig.json");
 			
 			return null;
 		}
