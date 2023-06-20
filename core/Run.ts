@@ -93,19 +93,21 @@ namespace Moduless
 				if (ex && typeof ex === "object" && !Array.isArray(ex))
 					out.push({ project, exported: ex });
 				
+				const g = globalThis as any;
+				
 				// Globalize the exports of the project.
 				for (const [name, value] of Object.entries(ex))
 				{
-					if (name in globalThis)
-					{
+					if (!(name in g))
+						g[name] = value;
+					
+					else if (g[name]?.constructor === Object)
+						Object.assign(g[name], value);
+					
+					else
 						console.warn(
 							`Skipping adding ${name} from ${project.projectPath} to global scope ` +
 							`because another member with this name is already defined globally.`);
-						
-						continue;
-					}
-					
-					(globalThis as any)[name] = value;
 				}
 			}
 			catch (e)
@@ -129,6 +131,8 @@ namespace Moduless
 		
 		if (!startingProject)
 			throw new Error("No projects found at location: " + target.projectPath);
+		
+		startHttpServer(graph.map(entry => entry.project));
 		
 		const tryResolveNamepace = (root: object) =>
 		{
@@ -178,6 +182,44 @@ namespace Moduless
 			await runSingleCover(coverName, coverFunction);
 		
 		return true;
+	}
+	
+	/**
+	 * Starts an HTTP server that serves the outFiles associated with the specified
+	 * list of projects.
+	 */
+	function startHttpServer(projects: Project[])
+	{
+		const outFiles = projects.map(p => p.outFile);
+		let charIndex = 0;
+		for (;;)
+		{
+			if (outFiles.some(f => f.length <= charIndex))
+				break;
+			
+			if (!outFiles.every(f => f[charIndex] === outFiles[0][charIndex]))
+				break;
+			
+			charIndex++;
+		}
+		
+		const path = outFiles[0].slice(0, charIndex);
+		
+		Moduless.createServer({
+			path,
+			route: path =>
+			{
+				if (path === "/")
+				{
+					return [
+						"<!DOCTYPE html>",
+						...outFiles.map(f => `<script src="${f.slice(charIndex)}"></script>`),
+					].join("\n");
+				}
+			}
+		});
+		
+		console.log("HTTP server is available at: http://localhost:" + Moduless.defaultHttpPort);
 	}
 	
 	/**
