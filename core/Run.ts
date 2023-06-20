@@ -132,8 +132,6 @@ namespace Moduless
 		if (!startingProject)
 			throw new Error("No projects found at location: " + target.projectPath);
 		
-		target.functionNamespace + target.functionName
-		
 		// Starts an HTTP server that serves the outFiles loaded 
 		// from the discovered set of projects.
 		{
@@ -152,7 +150,7 @@ namespace Moduless
 			}
 			
 			const path = outFiles[0].slice(0, charIndex);
-			const runJs = target.functionNamespace + "." + target.functionName + "()";
+			const runJs = ns + "." + target.functionName + "()";
 			const runScript = `<script>setTimeout(() => ${runJs})</script>`;
 			
 			Moduless.createServer({
