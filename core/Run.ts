@@ -132,7 +132,46 @@ namespace Moduless
 		if (!startingProject)
 			throw new Error("No projects found at location: " + target.projectPath);
 		
-		startHttpServer(graph.map(entry => entry.project));
+		target.functionNamespace + target.functionName
+		
+		// Starts an HTTP server that serves the outFiles loaded 
+		// from the discovered set of projects.
+		{
+			const projects = graph.map(entry => entry.project)
+			const outFiles = projects.map(p => p.outFile);
+			let charIndex = 0;
+			for (;;)
+			{
+				if (outFiles.some(f => f.length <= charIndex))
+					break;
+				
+				if (!outFiles.every(f => f[charIndex] === outFiles[0][charIndex]))
+					break;
+				
+				charIndex++;
+			}
+			
+			const path = outFiles[0].slice(0, charIndex);
+			const runJs = target.functionNamespace + "." + target.functionName + "()";
+			const runScript = `<script>setTimeout(() => ${runJs})</script>`;
+			
+			Moduless.createServer({
+				path,
+				route: path =>
+				{
+					if (path === "/")
+					{
+						return [
+							"<!DOCTYPE html>",
+							...outFiles.map(f => `<script src="${f.slice(charIndex)}"></script>`),
+							runScript
+						].join("\n");
+					}
+				}
+			});
+			
+			console.log("HTTP server is available at: http://localhost:" + Moduless.defaultHttpPort);
+		}
 		
 		const tryResolveNamepace = (root: object) =>
 		{
@@ -182,44 +221,6 @@ namespace Moduless
 			await runSingleCover(coverName, coverFunction);
 		
 		return true;
-	}
-	
-	/**
-	 * Starts an HTTP server that serves the outFiles associated with the specified
-	 * list of projects.
-	 */
-	function startHttpServer(projects: Project[])
-	{
-		const outFiles = projects.map(p => p.outFile);
-		let charIndex = 0;
-		for (;;)
-		{
-			if (outFiles.some(f => f.length <= charIndex))
-				break;
-			
-			if (!outFiles.every(f => f[charIndex] === outFiles[0][charIndex]))
-				break;
-			
-			charIndex++;
-		}
-		
-		const path = outFiles[0].slice(0, charIndex);
-		
-		Moduless.createServer({
-			path,
-			route: path =>
-			{
-				if (path === "/")
-				{
-					return [
-						"<!DOCTYPE html>",
-						...outFiles.map(f => `<script src="${f.slice(charIndex)}"></script>`),
-					].join("\n");
-				}
-			}
-		});
-		
-		console.log("HTTP server is available at: http://localhost:" + Moduless.defaultHttpPort);
 	}
 	
 	/**
