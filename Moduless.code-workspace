@@ -28,7 +28,7 @@
 				"name": "Debug default in NodeJS",
 				"type": "node",
 				"request": "launch",
-				"program": "${workspaceRoot}/build/moduless.js",
+				"program": "${workspaceFolder}/build/moduless.js",
 				"cwd": "${workspaceFolder}/example/",
 				"smartStep": true,
 				"sourceMaps": true
@@ -37,9 +37,9 @@
 				"name": "Debug 'set' in NodeJS",
 				"type": "node",
 				"request": "launch",
-				"program": "${workspaceRoot}/build/moduless.js",
+				"program": "${workspaceFolder}/build/moduless.js",
 				"args": [
-					"set", "./coverage/CoverExample.ts:4"
+					"set", "./coverage/CoverExample.ts:5"
 				],
 				"cwd": "${workspaceFolder}/example/",
 				"smartStep": true,
@@ -49,7 +49,7 @@
 				"name": "Debug 'run active' in NodeJS",
 				"type": "node",
 				"request": "launch",
-				"program": "${workspaceRoot}/build/moduless.js",
+				"program": "${workspaceFolder}/build/moduless.js",
 				"cwd": "${workspaceFolder}/example/",
 				"smartStep": true,
 				"sourceMaps": true
@@ -59,16 +59,19 @@
 				"type": "node",
 				"request": "launch",
 				"cwd": "${workspaceFolder}/example/",
-				"runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron",
-				"program": "${workspaceRoot}/build/moduless.js",
+				"runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
+				"program": "${workspaceFolder}/build/moduless.js",
 				"smartStep": true,
-				"sourceMaps": true
+				"sourceMaps": true,
+				"env": {
+					"DEBUG_URL": "https://www.google.com",
+				}
 			},
 			{
 				"name": "Debug 'run all' in NodeJS",
 				"type": "node",
 				"request": "launch",
-				"program": "${workspaceRoot}/build/moduless.js",
+				"program": "${workspaceFolder}/build/moduless.js",
 				"args": [
 					"all",
 					"Cover.cover"
@@ -82,8 +85,8 @@
 				"type": "node",
 				"request": "launch",
 				"cwd": "${workspaceFolder}/example/",
-				"runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron",
-				"program": "${workspaceRoot}/build/moduless.js",
+				"runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
+				"program": "${workspaceFolder}/build/moduless.js",
 				"args": [
 					"all"
 				],
@@ -95,8 +98,8 @@
 				"type": "node",
 				"request": "launch",
 				"cwd": "${workspaceFolder}/example/",
-				"runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron",
-				"program": "${workspaceRoot}/build/moduless.js",
+				"runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
+				"program": "${workspaceFolder}/build/moduless.js",
 				"args": [
 					"expression=coverExpression\\d"
 				],
