@@ -135,7 +135,7 @@ namespace Moduless
 		// Starts an HTTP server that serves the outFiles loaded 
 		// from the discovered set of projects.
 		{
-			const projects = graph.map(entry => entry.project)
+			const projects = graph.map(entry => entry.project);
 			const outFiles = projects.map(p => p.outFile);
 			let charIndex = 0;
 			for (;;)
