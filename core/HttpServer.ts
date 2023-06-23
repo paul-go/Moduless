@@ -16,7 +16,7 @@ namespace Moduless
 	{
 		const server = Http.createServer((req, res) =>
 		{
-			const path = req.url || "";
+			const path = (req.url || "").replace(/\?.+/, "");
 			const joined = Path.join(options.path, path);
 			if (!Fs.existsSync(joined))
 			{
