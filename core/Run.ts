@@ -159,6 +159,7 @@ namespace Moduless
 				{
 					if (path === "/")
 					{
+						const now = Date.now();
 						return [
 							"<!DOCTYPE html>",
 							`<meta charset="UTF-8">`,
@@ -166,7 +167,7 @@ namespace Moduless
 							`<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">`,
 							`<meta name="apple-mobile-web-app-title" content="Moduless">`,
 							`<meta name="viewport" content="initial-scale=1, minimum-scale=1, maximum-scale=1, viewport-fit=cover, width=device-width">`,
-							...outFiles.map(f => `<script src="${f.slice(charIndex)}"></script>`),
+							...outFiles.map(f => `<script src="${f.slice(charIndex)}?${now}"></script>`),
 							runScript
 						].join("\n");
 					}
