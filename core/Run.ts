@@ -90,7 +90,7 @@ namespace Moduless
 			try
 			{
 				const ex = require(project.outFile);
-				if (ex && typeof ex === "object" && !Array.isArray(ex))
+				if (ex && typeof ex !== "undefined" && !Array.isArray(ex))
 					out.push({ project, exported: ex });
 				
 				const g = globalThis as any;
